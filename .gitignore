@@ -48,3 +48,4 @@ Thumbs.db
 *.mov
 *.wmv
 
+/aml_quickstart/env/dev/.env
