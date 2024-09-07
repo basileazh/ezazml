@@ -8,13 +8,13 @@ import logging
 from datetime import datetime
 from typing import Optional
 
-from .settings import get_settings
+from .settings import get_settings, Settings
 
 
-settings = get_settings()
-LOG_FILE_PATH = settings.LOG_FILE_PATH
-LOG_DATETIME_FORMAT = settings.LOG_DATETIME_FORMAT
-LOG_FORMAT = settings.LOG_FORMAT
+settings: Settings = get_settings()
+LOG_FILE_PATH: str = settings.log.LOG_FILE_PATH
+LOG_DATETIME_FORMAT: str = settings.log.LOG_DATETIME_FORMAT
+LOG_FORMAT: str = settings.log.LOG_FORMAT
 
 logging.basicConfig(level=logging.INFO)
 
@@ -87,4 +87,3 @@ logger.info("Printing environment variables")
 logger.info(f"LOG_FORMAT: {LOG_FORMAT}")
 logger.info(f"LOG_FILE_PATH: {LOG_FILE_PATH}")
 logger.info(f"LOG_DATETIME_FORMAT: {LOG_DATETIME_FORMAT}")
-
