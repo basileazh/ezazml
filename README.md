@@ -39,7 +39,6 @@ Here is how to create a `.env` file in the `env/prd/` directory of your project 
 AML_WORKSPACE_NAME=<your_workspace_name>
 AML_SUBSCRIPTION_ID=<your_subscription_id>
 AML_RESOURCE_GROUP=<your_resource_group>
-AML_ACTIVATE_MLTABLES=True
 
 # Model settings
 MODEL_PATH=/models

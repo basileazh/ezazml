@@ -10,7 +10,6 @@
 #     with patch('from aml_quickstart.core.settings.get_settings'), patch('from aml_quickstart.core.settings.get_ml_client'):
 #         service = AmlDataService()
 #         service.ACTIVATE_ADLS = True
-#         service.ACTIVATE_MLTABLES = True
 #         service.ACTIVATE_DATABRICKS = True
 #         service.SUBSCRIPTION_ID = "sub123"
 #         service.RESOURCE_GROUP = "rg123"

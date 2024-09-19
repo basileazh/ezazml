@@ -45,7 +45,6 @@ class AmlDataService:
         self.WORKSPACE_NAME: str = self.settings.aml.AML_WORKSPACE_NAME
         self.SUBSCRIPTION_ID: str = self.settings.aml.AML_SUBSCRIPTION_ID
         self.RESOURCE_GROUP: str = self.settings.aml.AML_RESOURCE_GROUP
-        self.ACTIVATE_MLTABLES: bool = self.settings.aml.AML_ACTIVATE_MLTABLES
 
         # ADLS Gen2 & AML Datastore settings
         self.ACTIVATE_ADLS: bool = self.settings.aml_adls.ADLS_ACTIVATE
@@ -140,19 +139,12 @@ class AmlDataService:
         :example:filtered_mltable = mltable.filter('col("FBI Code") == "11"')
         :type filter_lines: str | None
         :raises ValueError: If the file format is not supported.
-        :raises ValueError: If ACTIVATE_MLTABLES is False.
 
         Example usage:
         data_service = AmlDataService()
         data = pd.read_csv("data.csv")
         data_service.create_mltable(["data.csv"], "data_mltable")
         """
-        # Check if mltables is activated
-        if not self.ACTIVATE_MLTABLES:
-            raise ValueError(
-                "To use mltables, ACTIVATE_MLTABLES must be True in settings."
-            )
-
         # Create the mltable
         if inputs_extension == MltFromTypeEnum.csv:  # Case csv
             input_paths_mlt = format_input_mlt(input_paths)
@@ -297,15 +289,15 @@ class AmlDataService:
         # Get the dataframe
         df: pd.DataFrame | None = None
 
-        # Case we load a dataset recorded as a mltables
-        if self.ACTIVATE_MLTABLES & (mltable_name is not None):
+        # Case we load a dataset recorded as a mltable
+        if mltable_name is not None:
             data_asset = self.ml_client.data.get(
                 name=mltable_name, version=mltable_version
             )
             tbl = mltable.load(f"azureml:/{data_asset.id}")
             df = tbl.to_pandas_dataframe()
 
-        # Case no mltables
+        # Case the dataset in not a mltable
         elif path is not None:
             file_extension = get_file_extension(path)
             mlt_asset_type = get_mlt_asset_type(path)

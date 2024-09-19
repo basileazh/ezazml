@@ -23,7 +23,6 @@ class AzureMLSettings(BaseSettings):
     AML_WORKSPACE_NAME: str = ""
     AML_SUBSCRIPTION_ID: str = ""
     AML_RESOURCE_GROUP: str = ""
-    AML_ACTIVATE_MLTABLES: bool = True
 
 
 class ADLSDatastoreSettings(BaseSettings):
