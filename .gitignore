@@ -51,5 +51,11 @@ Thumbs.db
 # Environment files
 /env/dev/.env
 
+# terraform
+*.tfstate*
+*.tfvars
+*.tfplan
+.terraform/
+
 # Test outputs
 tests/temp/

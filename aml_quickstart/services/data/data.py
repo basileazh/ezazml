@@ -43,7 +43,7 @@ class AmlDataService:
 
         # Azure ML settings
         self.WORKSPACE_NAME: str = self.settings.aml.AML_WORKSPACE_NAME
-        self.SUBSCRIPTION_ID: str = self.settings.aml.AML_SUBSCRIPTION_ID
+        self.SUBSCRIPTION_ID: str = self.settings.aml.ARM_SUBSCRIPTION_ID
         self.RESOURCE_GROUP: str = self.settings.aml.AML_RESOURCE_GROUP
 
         # ADLS Gen2 & AML Datastore settings

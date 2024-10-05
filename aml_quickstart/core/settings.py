@@ -21,7 +21,7 @@ class AzureMLSettings(BaseSettings):
     """
 
     AML_WORKSPACE_NAME: str = ""
-    AML_SUBSCRIPTION_ID: str = ""
+    ARM_SUBSCRIPTION_ID: str = ""
     AML_RESOURCE_GROUP: str = ""
 
 

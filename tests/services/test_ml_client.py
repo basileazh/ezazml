@@ -10,7 +10,7 @@ def mock_settings():
     with patch("aml_quickstart.core.settings.get_settings") as mock_get_settings:
         # Mock the settings with the necessary attributes
         mock_settings_instance = MagicMock()
-        mock_settings_instance.aml.AML_SUBSCRIPTION_ID = "fake_subscription_id"
+        mock_settings_instance.aml.ARM_SUBSCRIPTION_ID = "fake_subscription_id"
         mock_settings_instance.aml.AML_RESOURCE_GROUP = "fake_resource_group"
         mock_settings_instance.aml.AML_WORKSPACE_NAME = "fake_workspace_name"
 
@@ -37,7 +37,7 @@ def test_get_ml_client(mock_settings, mock_default_azure_credential, mock_ml_cli
     # Assertions to ensure the function behaves as expected
     mock_ml_client.assert_called_once_with(
         mock_default_azure_credential.return_value,
-        mock_settings.return_value.aml.AML_SUBSCRIPTION_ID,
+        mock_settings.return_value.aml.ARM_SUBSCRIPTION_ID,
         mock_settings.return_value.aml.AML_RESOURCE_GROUP,
         mock_settings.return_value.aml.AML_WORKSPACE_NAME,
     )
