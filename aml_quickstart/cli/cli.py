@@ -104,7 +104,7 @@ def create_mltable(
 ):
     """Create a mltable from input paths like '[{"file": "wasbs://data@azuremlexampledata.blob.core.windows.net/titanic.csv"}]'"""
 
-    # Paring arguments
+    # Parsing arguments
 
     keep_columns_list = keep_columns.split(",") if keep_columns else []
     drop_columns_list = drop_columns.split(",") if drop_columns else []

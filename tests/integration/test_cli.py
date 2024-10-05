@@ -25,7 +25,7 @@ def data_path():
 @pytest.fixture
 def temp_folder():
     yield "temp/"
-    os.system("rm -rf temp/")
+    os.system('rm -rf "tests/temp/"')
 
 
 def test_create_or_update_adls_datastore(runner):
