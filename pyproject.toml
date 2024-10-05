@@ -4,9 +4,9 @@
 # Contact: basile.elazhari@ekimetrics.com, https://www.linkedin.com/in/basile-el-azhari/
 
 [tool.poetry]
-name = "aml-quickstart"
+name = "ezazml"
 version = "0.1.0"
-description = "Quickstart to Azure Machine Learning"
+description = "An easy way to deploy your machine learning models on Azure Machine Learning"
 authors = ["basile el azhari <hitchhikesaver@gmail.com>"]
 
 [tool.poetry.dependencies]

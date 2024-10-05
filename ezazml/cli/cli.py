@@ -5,10 +5,10 @@
 
 import click
 
-from aml_quickstart.core.log import logger
-from aml_quickstart.services.data.data import AmlDataService
+from ezazml.core.log import logger
+from ezazml.services.data.data import AmlDataService
 from azure.ai.ml.constants import AssetTypes
-from aml_quickstart.services.data.models import AMLFSOverwriteModeEnum
+from ezazml.services.data.models import AMLFSOverwriteModeEnum
 
 # Initialize the data service
 data_service = AmlDataService()

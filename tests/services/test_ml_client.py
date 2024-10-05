@@ -2,12 +2,12 @@ import pytest
 from unittest.mock import patch, MagicMock
 
 # Assuming the module name is `ml_client_module` and it's located in the same directory
-from aml_quickstart.services.ml_client import get_ml_client
+from ezazml.services.ml_client import get_ml_client
 
 
 @pytest.fixture
 def mock_settings():
-    with patch("aml_quickstart.core.settings.get_settings") as mock_get_settings:
+    with patch("ezazml.core.settings.get_settings") as mock_get_settings:
         # Mock the settings with the necessary attributes
         mock_settings_instance = MagicMock()
         mock_settings_instance.aml.ARM_SUBSCRIPTION_ID = "fake_subscription_id"

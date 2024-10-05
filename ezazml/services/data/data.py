@@ -13,9 +13,9 @@ from azure.ai.ml.entities import Data
 from azure.ai.ml.constants import AssetTypes
 from azureml.fsspec import AzureMachineLearningFileSystem
 
-from aml_quickstart.core.log import logger
-from aml_quickstart.core.settings import Settings, get_settings
-from aml_quickstart.services.ml_client import get_ml_client
+from ezazml.core.log import logger
+from ezazml.core.settings import Settings, get_settings
+from ezazml.services.ml_client import get_ml_client
 from .models import (
     AzureMLTablesAssetTypesEnum,
     DataSourceEnum,

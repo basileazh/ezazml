@@ -2,12 +2,12 @@
 # from unittest.mock import Mock, patch
 # import pandas as pd
 #
-# from aml_quickstart.services.data.data import AmlDataService, DataSourceEnum, AMLFSOverwriteModeEnum, AzureMLTablesAssetTypesEnum
+# from ezazml.services.data.data import AmlDataService, DataSourceEnum, AMLFSOverwriteModeEnum, AzureMLTablesAssetTypesEnum
 #
 #
 # @pytest.fixture
 # def aml_data_service():
-#     with patch('from aml_quickstart.core.settings.get_settings'), patch('from aml_quickstart.core.settings.get_ml_client'):
+#     with patch('from ezazml.core.settings.get_settings'), patch('from ezazml.core.settings.get_ml_client'):
 #         service = AmlDataService()
 #         service.ACTIVATE_ADLS = True
 #         service.ACTIVATE_DATABRICKS = True

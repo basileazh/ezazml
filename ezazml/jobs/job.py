@@ -7,8 +7,8 @@
 from azure.ai.ml import command, Input, Output, MLClient
 from azure.ai.ml.constants import AssetTypes, InputOutputModes
 
-from aml_quickstart.services.ml_client import get_ml_client
-from aml_quickstart.services.data.data import AmlDataService
+from ezazml.services.ml_client import get_ml_client
+from ezazml.services.data.data import AmlDataService
 
 
 class DataJob:

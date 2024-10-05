@@ -7,9 +7,9 @@
 import os
 import pytest
 from click.testing import CliRunner
-from aml_quickstart.cli.cli import cli
+from ezazml.cli.cli import cli
 
-from aml_quickstart.core.log import logger
+from ezazml.core.log import logger
 
 
 @pytest.fixture

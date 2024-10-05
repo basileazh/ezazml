@@ -7,7 +7,7 @@
 from azure.ai.ml import MLClient
 from azure.identity import DefaultAzureCredential
 
-from aml_quickstart.core.settings import get_settings
+from ezazml.core.settings import get_settings
 
 
 settings = get_settings()
