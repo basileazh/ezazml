@@ -35,9 +35,19 @@ You can configure using a `.env` file or by exporting the environment variables 
 Here is how to create a `.env` file in the `env/prd/` directory of your project and add the following environment variables:
 
 ```dotenv
+# Auth settings
+AZURE_CLIENT_ID=<spn_client_ID>
+AZURE_CLIENT_SECRET=<spn_client_secret>
+AZURE_TENANT_ID=<tenant_ID>
+AZURE_SUBSCRIPTION_ID=<subscription_ID>
+
+# Infrastructure settings
+TF_VAR_FILE_PATH=dev.tfvars
+TF_OUTPUT_PATH=dev.tfplan
+
 # Azure ML settings
+RG_NAME=<your_resource_group_name>
 AML_WORKSPACE_NAME=<your_workspace_name>
-AML_SUBSCRIPTION_ID=<your_subscription_id>
 AML_RESOURCE_GROUP=<your_resource_group>
 
 # Model settings

@@ -19,7 +19,7 @@ def get_ml_client() -> MLClient:
     """
     return MLClient(
         DefaultAzureCredential(),
-        settings.aml.ARM_SUBSCRIPTION_ID,
+        settings.aml.AZURE_SUBSCRIPTION_ID,
         settings.aml.AML_RESOURCE_GROUP,
         settings.aml.AML_WORKSPACE_NAME,
     )
