@@ -37,7 +37,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-ezazml = "aml_quickstart.cli.cli:cli"
+ezazml = "ezazml.cli.cli:cli"
 
 [tool.bandit]
 exclude_dirs = ["**/test_*.py", "*/test_*.py"]
