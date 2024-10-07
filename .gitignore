@@ -49,14 +49,16 @@ Thumbs.db
 *.wmv
 
 # Environment files
-/env/dev/.env
+*.env
 
 # terraform
 *.tfstate*
 *.tfvars
 *.tfplan
 .terraform/
-*.locl.hcl
+*.lock.hcl
 
 # Test outputs
-tests/temp/
+tests/temp/*
+tests/temp/*
+temp/*
