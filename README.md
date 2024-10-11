@@ -44,7 +44,11 @@ AZURE_SUBSCRIPTION_ID=<subscription_ID>
 
 # Infrastructure settings
 TF_WORKSPACE=<dev_or_prd>
-TF_VAR_superuser_object_id=<superuser_object_id>
+TF_VAR_backend_resource_name=<ex_terraform-state-rg>
+TF_VAR_backend_storage_account_name=<ex_terraformbackendasa>
+TF_VAR_backend_container_name=<ex_tfstate>
+TF_VAR_backend_terraform_state_key=<ex_terraform.tfstate>
+TF_VAR_super_user_object_id=<superuser_object_id>
 TF_VAR_tenant_id=<tenant_ID>
 TF_VAR_auth_application_name_prefix=<auth_application_name>
 # The full application name is the concatenation of the auth_application_name and the workspace name
@@ -54,6 +58,8 @@ TF_VAR_user_password=<user_password>
 TF_VAR_location=westeurope
 TF_VAR_resource_name_prefix=<resource_name_prefix>
 TF_OUTPUT_NAME=tf.tfplan
+
+
 
 # Azure ML settings
 AML_WORKSPACE_NAME=<your_workspace_name>
@@ -130,8 +136,6 @@ variables in a `.env` file there.
 
 Set the following environment variables:
 ```bash
-export AZURE_CLIENT_ID=<your_azure_client_id>
-export AZURE_CLIENT_SECRET=<your_azure_client_secret>
 export AZURE_TENANT_ID=<your_azure_tenant_id>
 export AZURE_SUBSCRIPTION_ID=<your_azure_subscription_id>
 export TF_WORKSPACE=<terraform_workspace>
@@ -159,7 +163,15 @@ make login
 ```
 
 - **Using Service Principal:**
-If you are logging in using a service principal, run the following command:
+If you are logging in using a service principal, make sure to set the following environment variables:
+```bash
+- export AZURE_CLIENT_ID=<your_azure_client_id>
+- export AZURE_CLIENT_SECRET=<your_azure_client_secret>
+```
+If you retrieved the service principal credentials from a previous deployment, you can set them as environment variables 
+with a Contributor role by default on the Resource group containing all resources including Azure ML workspace.
+
+After setting the environment variables, authenticate to Azure using the service principal:
 ```bash
 make login-spn
 ```
@@ -187,6 +199,18 @@ To apply the changes and create or update resources, run the following command:
 ```bash
 make tf-apply
 ```
+
+**SPN Credentials**
+You can now retrieve the value of the authentication application name and the workspace name from the Terraform output.
+You can use them to authenticate to Azure ML and interact with the workspace using the `ezazml` CLI, 
+with a Contributor role by default on the Resource group containing all resources including Azure ML workspace.
+```bash
+- export AZURE_CLIENT_ID=<your_azure_client_id>
+- export AZURE_CLIENT_SECRET=<your_azure_client_secret>
+```
+
+Azure portal: https://portal.azure.com/
+
 ### Conclusion on infrastructure deployment
 This documentation provides the necessary steps to deploy Azure ML and associated services using Terraform. Ensure you have set all required environment variables, authenticate to Azure correctly, and follow the outlined steps for a successful deployment.
 

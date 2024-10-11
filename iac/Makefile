@@ -25,3 +25,9 @@ tf-apply:
 
 tf-apply-aa:
 	terraform apply -auto-approve
+
+tf-destroy:
+	terraform destroy
+
+tf-destroy-aa:
+	terraform destroy -auto-approve

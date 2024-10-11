@@ -32,3 +32,9 @@ tf-apply:
 
 tf-apply-aa:
 	${MAKE} -C ../../iac/ tf-apply-aa
+
+tf-destroy:
+	${MAKE} -C ../../iac/ tf-destroy
+
+tf-destroy-aa:
+	${MAKE} -C ../../iac/ tf-destroy-aa
