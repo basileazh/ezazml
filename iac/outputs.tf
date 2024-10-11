@@ -1,5 +1,5 @@
 output "key_vault_name" {
-  value = azurerm_key_vault.default.name
+  value = azurerm_key_vault.akv.name
 }
 
 output "storage_account_name" {

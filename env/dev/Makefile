@@ -16,19 +16,19 @@ run-tests-cov:
 	${MAKE} -C ../../ run-tests-cov
 
 tf-init:
-	${MAKE} -C infra/ tf-init
+	${MAKE} -C ../../iac/ tf-init
 
 tf-upgrade:
-	${MAKE} -C infra/ tf-upgrade
+	${MAKE} -C ../../iac/ tf-upgrade
 
 tf-import-rg:
-	${MAKE} -C infra/ tf-import-rg
+	${MAKE} -C ../../iac/ tf-import-rg
 
 tf-plan:
-	${MAKE} -C infra/ tf-plan
+	${MAKE} -C ../../iac/ tf-plan
 
 tf-apply:
-	${MAKE} -C infra/ tf-apply
+	${MAKE} -C ../../iac/ tf-apply
 
 tf-apply-aa:
-	${MAKE} -C infra/ tf-apply-aa
+	${MAKE} -C ../../iac/ tf-apply-aa

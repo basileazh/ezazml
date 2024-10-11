@@ -1,9 +1,13 @@
 # Auth variables
 
-variable "enterprise_application_name" {
+variable "super_user_object_id" {
   type        = string
-  description = "Enterprise Application Name"
-  default     = "ezazml-app-dev-01"
+  description = "Super User Object ID"
+}
+
+variable "auth_application_name_prefix" {
+  type        = string
+  description = "Application Name"
 }
 
 variable "user_principal_name_prefix" {
@@ -29,19 +33,13 @@ variable "tenant_id" {
 
 # Resource variables
 
-variable "environment" {
-  type        = string
-  description = "Name of the environment"
-  default     = "dev"
-}
-
 variable "location" {
   type        = string
   description = "Location of the resources"
   default     = "eastus"
 }
 
-variable "prefix" {
+variable "resource_name_prefix" {
   type        = string
   description = "Prefix of the resource name"
   default     = "ml"

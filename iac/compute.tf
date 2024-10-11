@@ -1,13 +1,13 @@
 # Compute instance
 resource "azurerm_machine_learning_compute_instance" "main" {
-  name                          = "${var.prefix}-${var.environment}-instance-w01"
+  name                          = "${var.resource_name_prefix}-${terraform.workspace}-instance-w01"
   machine_learning_workspace_id = azurerm_machine_learning_workspace.default.id
   virtual_machine_size          = "STANDARD_DS2_V2"
 }
 
 # Compute Cluster
 resource "azurerm_machine_learning_compute_cluster" "compute" {
-  name                          = "${var.prefix}-${var.environment}-cpu-cluster-w01"
+  name                          = "${var.resource_name_prefix}-${terraform.workspace}-cpu-cluster-w01"
   location                      = azurerm_resource_group.rg.location
   machine_learning_workspace_id = azurerm_machine_learning_workspace.default.id
   vm_priority                   = "Dedicated"
