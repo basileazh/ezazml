@@ -2,17 +2,29 @@
 
 [//]: # ([![Build Status]&#40;https://dev.azure.com/ezazml/ezazml/_apis/build/status/ezazml.ezazml?branchName=main&#41;]&#40;https://dev.azure.com/ezazml/ezazml/_build/latest?definitionId=1&branchName=main&#41;)
 [//]: # ([![codecov]&#40;https://codecov.io/gh/ezazml/ezazml/branch/main/graph/badge.svg?token=JZQZQZQZQZ&#41;]&#40;https://codecov.io/gh/ezazml/ezazml&#41;)
-[![PyPI version](https://badge.fury.io/py/ezazml.svg)](https://badge.fury.io/py/ezazml)
-[![PyPI - Downloads](https://img.shields.io/pypi/dm/ezazml)](https://pypi.org/project/ezazml/)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/ezazml)](https://pypi.org/project/ezazml/)
-[![PyPI - License](https://img.shields.io/pypi/l/ezazml)](https://pypi.org/project/ezazml/)
+[//]: # ([![PyPI version]&#40;https://badge.fury.io/py/ezazml.svg&#41;]&#40;https://badge.fury.io/py/ezazml&#41;)
+
+[//]: # ([![PyPI - Downloads]&#40;https://img.shields.io/pypi/dm/ezazml&#41;]&#40;https://pypi.org/project/ezazml/&#41;)
+
+[//]: # ([![PyPI - Python Version]&#40;https://img.shields.io/pypi/pyversions/ezazml&#41;]&#40;https://pypi.org/project/ezazml/&#41;)
+
+[//]: # ([![PyPI - License]&#40;https://img.shields.io/pypi/l/ezazml&#41;]&#40;https://pypi.org/project/ezazml/&#41;)
 
 [![Azure ML](https://img.shields.io/badge/Azure%20ML-SDK-blue)](https://pypi.org/project/azureml-sdk/)
 [![Databricks](https://img.shields.io/badge/Databricks-SDK-blue)](https://pypi.org/project/databricks-cli/)
 [![Azure Data Lake Storage](https://img.shields.io/badge/Azure%20Data%20Lake%20Storage-SDK-blue)](https://pypi.org/project/azure-storage-file-datalake/)
 [![Azure Blob Storage](https://img.shields.io/badge/Azure%20Blob%20Storage-SDK-blue)](https://pypi.org/project/azure-storage-blob/)
 
-[![GitHub](https://img.shields.io/github/license/ezazml/ezazml)](
+[//]: # ([![GitHub]&#40;https://img.shields.io/github/license/ezazml/ezazml&#41;]&#40;https://github.com/basileazh/ezazml/blob/main/LICENSE&#41;)
+
+[//]: # ([![GitHub]&#40;https://img.shields.io/github/issues/ezazml/ezazml&#41;]&#40;https://github.com/basileazh/ezazml/issues&#41;)
+
+[//]: # ([![GitHub]&#40;https://img.shields.io/github/stars/ezazml/ezazml&#41;]&#40;https://github.com/basileazh/ezazml/stargazers&#41;)
+
+[//]: # ([![GitHub]&#40;https://img.shields.io/github/forks/ezazml/ezazml&#41;]&#40;https://github.com/basileazh/ezazml/network/members&#41;)
+
+[//]: # ([![GitHub]&#40;https://img.shields.io/github/contributors/ezazml/ezazml&#41;]&#40;https://github.com/basileazh/ezazml/graphs/contributors&#41;)
+
 
 
 ## Introduction
@@ -113,6 +125,15 @@ Terraform Configuration Documentation for Azure ML Deployment
 ### Overview
 This package provides a Terraform configuration to deploy an Azure Machine Learning (Azure ML) instance, along with other associated services on Azure. The infrastructure is designed to be modular and environment-specific, allowing for deployment in different environments like `dev`, `prd`, etc.
 
+### Prerequisites
+Before deploying the infrastructure, ensure you have the following prerequisites:
+- Azure Subscription  https://azure.microsoft.com/en-us/free/
+- Azure CLI           https://docs.microsoft.com/en-us/cli/azure/install-azure-cli
+- Terraform CLI       https://learn.hashicorp.com/tutorials/terraform/install-cli
+- Environment variables set in the `.env` file or exported in the terminal
+- Azure Data Lake Storage (ADLS) account dedicated to terraform backend management across projects 
+(if backend is configured to use ADLS)
+
 ### Services Defined in Terraform Code
 The Terraform configuration in this package deploys the following services:
 - Azure Machine Learning Instance
@@ -178,9 +199,14 @@ make login-spn
 
 #### Step 4: Initialize Terraform
 
-Run the `make tf-init` command to initialize Terraform. This will set up the backend and configure the state according to the settings in the `providers.tf` file. Additionally, two workspaces, `dev` and `prd`, will be created.
+Run the `make tf-init` command to initialize Terraform. This will set up the backend and configure the state according 
+to the settings in the `providers.tf` file. Additionally, the `dev` workspace will be created if it does not already exist.
+
+##### TODO : Add the `env/prd/` folder and the `make tf-init` command to initialize the production workspace.
+
 **Note:** 
-- If your backend is configured to use Azure Data Lake Storage (ADLS), you will need to create the storage account beforehand in a dedicated resource group.
+- If your backend is configured to use Azure Data Lake Storage (ADLS), you will need to create the storage account 
+beforehand in a dedicated resource group.
 - The recommended naming conventions for this Terraform setup can be found in the `infra/providers.tf` file.
 
 #### Step 5: Import Existing Resource Group (Optional)
@@ -215,9 +241,25 @@ Azure portal: https://portal.azure.com/
 This documentation provides the necessary steps to deploy Azure ML and associated services using Terraform. Ensure you have set all required environment variables, authenticate to Azure correctly, and follow the outlined steps for a successful deployment.
 
 
-## Azure ML Workspace
+## Azure ML Workspace Management
 
-This package provides the `ezazml` command to interact with your Azure ML Workspace. 
+This package provides the `ezazml` CLI command to interact with your Azure ML Workspace. 
+
+### Overview
+
+The `ezazml` CLI is a command-line interface that allows you to interact with your Azure ML Workspace.
+It provides commands to create or update datastores, upload files to datastores, and create MLTables to 
+reference your training datasets. It provides several default use cases to simplify the process of setting up 
+your MLOPS Azure ML Workspace for training and inference jobs.
+
+### Installation
+
+To install the package, clone the repository and run the following command:
+    
+```bash
+git clone https://github.com/basileazh/ezazml.git
+```
+
 Please activate you virtualenv before running the commands. If you are using Poetry, it can be done with `poetry shell`
 or by adding `poetry run` before any command.
 
@@ -307,7 +349,7 @@ make install-dependencies
 After installing the package, you have to set the environment variables in the `env/dev/.env` file or in the terminal.
 If you use dotenv, add `dotenv` before every following `make` command to load the environment variables.
 
-Please navigate to the `env/dev` folder and run the following command:
+Please navigate to the `env/dev/` folder and run the following command:
 
 #### Initialize the Azure ML dev workspace
 
