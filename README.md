@@ -49,6 +49,19 @@ just by configuring environment variables. For the moment, the following use cas
 ![20240919_ezazml_documentation_simple_MLOPS_overview.jpg](docs%2Fv0%2F20240919_ezazml_documentation_simple_MLOPS_overview.jpg)
 
 
+## License
+
+This project is licensed under the GNU GENERAL PUBLIC LICENSE - see the [LICENSE](LICENSE) file for details.
+
+
+## Installation
+
+To install the package, clone the repository and run the following command:
+
+```bash
+git clone https://github.com/basileazh/ezazml.git
+```
+
 ## Configuration
 
 Configuring the application is done with environment variables.
@@ -59,33 +72,52 @@ Here is how to create a `.env` file in the `env/prd/` or `env/dev/` directory of
 
 ```dotenv
 # Auth settings
-AZURE_CLIENT_ID=<spn_client_ID>
-AZURE_CLIENT_SECRET=<spn_client_secret>
-AZURE_TENANT_ID=<tenant_ID>
-AZURE_SUBSCRIPTION_ID=<subscription_ID>
+AZURE_CLIENT_ID=<spn_client_ID># Service Principal client ID for auth to Azure. Available in the Azure portal and after the first Terraform apply iac deployment.
+AZURE_CLIENT_SECRET=<spn_client_secret># Service Principal secret for auth to Azure. Available in the Azure portal and after the first Terraform apply iac deployment.
+AZURE_TENANT_ID=<tenant_ID># Tenant ID for auth to Azure. Available in the Azure portal.
+AZURE_SUBSCRIPTION_ID=<subscription_ID># Subscription ID for auth to Azure. Available in the Azure portal.
 
 # Infrastructure settings
-TF_WORKSPACE=<dev_or_prd>
-TF_VAR_backend_resource_name=<ex_terraform-state-rg>
-TF_VAR_backend_storage_account_name=<ex_terraformbackendasa>
-TF_VAR_backend_container_name=<ex_tfstate>
-TF_VAR_backend_terraform_state_key=<ex_terraform.tfstate>
-TF_VAR_super_user_object_id=<superuser_object_id>
-TF_VAR_tenant_id=<tenant_ID>
-TF_VAR_auth_application_name_prefix=<auth_application_name>
-# The full application name is the concatenation of the auth_application_name and the workspace name
-TF_VAR_user_principal_name_prefix=<user_principal_name_prefix>
+TF_WORKSPACE=<dev># Other workspaces can be created by duplicating the structure in the env/ folder.
+TF_VAR_super_user_object_id=<super_user_object_id># The object ID of the super user. Can be found in the Azure portal.
+TF_VAR_tenant_id=<tenant_ID># Same as AZURE_TENANT_ID
+TF_VAR_auth_application_name_prefix=<auth_application_name># The full application name will be the concatenation of the auth_application_name and the workspace name
+TF_VAR_user_principal_name_prefix=<user_principal_name_prefix># The full user principal name will be the concatenation of the user_principal_name, '@' and the domain of the tenant
 TF_VAR_user_display_name=<user_display_name>
 TF_VAR_user_password=<user_password>
-TF_VAR_location=westeurope
-TF_VAR_resource_name_prefix=<resource_name_prefix>
+TF_VAR_location=westeurope# The location of the to-be Azure resource. https://azure.microsoft.com/en-gb/explore/global-infrastructure/geographies/
+TF_VAR_resource_name_prefix=<resource_name_prefix># The prefix for the to-be resource names. Ex: "ezazml"
+TF_VAR_adls_container_name=<adls_container_name># The name of the to-be ADLS container. Ex: "ezazml"
 TF_OUTPUT_NAME=tf.tfplan
 
-
-
 # Azure ML settings
-AML_WORKSPACE_NAME=<your_workspace_name>
-AML_RESOURCE_GROUP=<your_resource_group>
+AML_WORKSPACE_NAME=<your_workspace_name># The name of the Azure ML workspace. Available in the Azure portal.
+AML_RESOURCE_GROUP=<your_resource_group># The name of the Azure ML resource group. Available in the Azure portal.
+
+# Data settings
+DATA_PATH=<path_to_input_data># The path to the input data. Can be a local path, a URL, a path to a blob storage or a combination or list of these.
+DATA_INPUTS_EXTENSION=<csv, parquet, json or delta>
+DATA_MLTABLE_SAVE_PATH=<path_to_save_mltable># Recommended naming convention for the MLTable save path: data/bronze/ml_table_titanic
+DATA_HEADERS=all_files_same_headers# Only for CSV. Other options are all_files_different_headers, from_first_file, no_header
+DATA_DESCRIPTION='My feature dataframe asset'
+DATA_INFER_COLUMN_TYPES_CSV=True# Only for CSV. Set to True to infer column types
+DATA_INPUT_KEEP_COLUMNS=# Comma-separated list of columns to keep
+DATA_INPUT_DROP_COLUMNS=# Comma-separated list of columns to drop
+
+# ADLS settings - if you want to use ADLS as a storage
+ADLS_ACTIVATE=True# Set to True to use ADLS as a storage.
+ADLS_ACCOUNT_KEY=<set_your_account_key>
+ABDS_NAME=<abds_name># The name of the to-be Azure Blob Datastore that will be created in the Azure ML workspace to access the ADLS container.
+ABDS_DESCRIPTION='Datastore pointing to a blob container using https protocol. From the Azure ML workspace.'
+ABDS_ACCOUNT_NAME=<set_your_account_name># The name of the ADLS account. Available in the Azure portal.
+ABDS_CONTAINER_NAME=<set_your_container_name># The name of the ADLS container. Available in the Azure portal.
+ABDS_PROTOCOL=https
+
+# Databricks settings - if you want to use Databricks as a storage
+DATABRICKS_ACTIVATE=False# Set to True to use Databricks as a storage.
+DATABRICKS_HOST=<your_host_url>
+DATABRICKS_PAT=<your_token>
+DATABRICKS_DBFS_PREFIX=dbfs://
 
 # Model settings
 MODEL_PATH=/models
@@ -94,35 +126,11 @@ MODEL_VERSION=1.0
 MODEL_VERSION_NOTE='First version of the model'
 # ADD HERE ENV VARS FOR MODEL DEPLOYMENT AS AN ALWAYS-ON ENDPOINT
 
-# Data settings
-DATA_PATH=
-DATA_MLTABLE_SAVE_PATH=
-DATA_INPUT_EXTENSION=
-DATA_HEADERS=
-DATA_DESCRIPTION='My feature dataframe asset'
-
-# ADLS settings - if you want to use ADLS as a storage
-ADLS_ACTIVATE=True
-ADLS_ACCOUNT_KEY=<set_your_account_key>
-ABDS_NAME=<abds_name>
-ABDS_DESCRIPTION='Datastore pointing to a blob container using https protocol. From the Azure ML workspace.'
-ABDS_ACCOUNT_NAME=<set_your_account_name>
-ABDS_CONTAINER_NAME=<set_your_container_name>
-ABDS_PROTOCOL=https
-
-# Databricks settings - if you want to use Databricks as a storage
-DATABRICKS_ACTIVATE=False
-DATABRICKS_HOST=<your_host_url>
-DATABRICKS_PAT=<your_token>
-DATABRICKS_DBFS_PREFIX=dbfs://
-
 # Logging settings
+# The log file path template should contain a [DATETIME_PLACEHOLDER] that will be replaced by the current datetime.
 LOG_FILE_PATH_TEMPLATE=logs/[DATETIME_PLACEHOLDER]_app.log
 LOG_FORMAT='[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s'
 LOG_DATETIME_FORMAT=%Y-%m-%d_%H
-
-# Adjust the LOG_FILE_PATH according to your environment
-LOG_FILE_PATH=logs/[DATETIME_PLACEHOLDER]_app.log
 ```
 
 If you use dotenv, add `dotenv` before every following `make` command in the `env/dev/` or `env/prd/` to load the environment variables.
@@ -137,12 +145,29 @@ This package provides a Terraform configuration to deploy an Azure Machine Learn
 
 ### Prerequisites
 Before deploying the infrastructure, ensure you have the following prerequisites:
-- Azure Subscription  https://azure.microsoft.com/en-us/free/
-- Azure CLI           https://docs.microsoft.com/en-us/cli/azure/install-azure-cli
-- Terraform CLI       https://learn.hashicorp.com/tutorials/terraform/install-cli
+- Azure Subscription 
+https://azure.microsoft.com/en-us/free/
+- Azure CLI           
+https://docs.microsoft.com/en-us/cli/azure/install-azure-cli
+- Terraform CLI       
+https://learn.hashicorp.com/tutorials/terraform/install-cli
+- Azure Data Lake Storage (ADLS) account dedicated to terraform backend management across projects
+  (if backend is configured to use ADLS)
+https://docs.microsoft.com/en-us/azure/storage/blobs/data-lake-storage-introduction
 - Environment variables set in the `.env` file or exported in the terminal
-- Azure Data Lake Storage (ADLS) account dedicated to terraform backend management across projects 
-(if backend is configured to use ADLS)
+
+### Terraform Backend Configuration
+
+The Terraform backend is configured to use Azure Data Lake Storage (ADLS) as the backend storage.
+To configure the backend, open the `iac/providers.tf` file and set the following variables:
+```hcl
+  backend "azurerm" {
+    resource_group_name  = "terraform-state-rg"
+    storage_account_name = "terraformbackendasa"
+    container_name       = "tfstate"
+    key                  = "terraform.tfstate"
+  }
+```
 
 ### Services Defined in Terraform Code
 The Terraform configuration in this package deploys the following services:
@@ -166,19 +191,19 @@ variables in a `.env` file there.
 #### Step 2: Set Environment Variables
 
 Set the following environment variables:
-```bash
-export AZURE_TENANT_ID=<your_azure_tenant_id>
-export AZURE_SUBSCRIPTION_ID=<your_azure_subscription_id>
-export TF_WORKSPACE=<terraform_workspace>
-export TF_VAR_super_user_object_id=<super_user_object_id>
-export TF_VAR_tenant_id=<tenant_id>
-export TF_VAR_auth_application_name_prefix=<application_name_prefix>
-export TF_VAR_user_principal_name_prefix=<user_principal_name_prefix>
-export TF_VAR_user_display_name=<user_display_name>
-export TF_VAR_user_password=<user_password>
-export TF_VAR_location=<location>
-export TF_VAR_resource_name_prefix=<resource_name_prefix>
-export TF_OUTPUT_PATH=<path_to_store_terraform_output>
+```dotenv
+AZURE_TENANT_ID=<your_azure_tenant_id>
+AZURE_SUBSCRIPTION_ID=<your_azure_subscription_id>
+TF_WORKSPACE=<terraform_workspace>
+TF_VAR_super_user_object_id=<super_user_object_id>
+TF_VAR_tenant_id=<tenant_id>
+TF_VAR_auth_application_name_prefix=<application_name_prefix>
+TF_VAR_user_principal_name_prefix=<user_principal_name_prefix>
+TF_VAR_user_display_name=<user_display_name>
+TF_VAR_user_password=<user_password>
+TF_VAR_location=<location>
+TF_VAR_resource_name_prefix=<resource_name_prefix>
+TF_OUTPUT_PATH=<path_to_store_terraform_output>
 ```
 If you are using a `.env` file, ensure that the file is present in the environment folder and contains the required 
 environment variables and set their values accordingly. 
@@ -195,9 +220,9 @@ make login
 
 - **Using Service Principal:**
 If you are logging in using a service principal, make sure to set the following environment variables:
-```bash
-- export AZURE_CLIENT_ID=<your_azure_client_id>
-- export AZURE_CLIENT_SECRET=<your_azure_client_secret>
+```dotenv
+AZURE_CLIENT_ID=<your_azure_client_id>
+AZURE_CLIENT_SECRET=<your_azure_client_secret>
 ```
 If you retrieved the service principal credentials from a previous deployment, you can set them as environment variables 
 with a Contributor role by default on the Resource group containing all resources including Azure ML workspace.
@@ -240,9 +265,9 @@ make tf-apply
 You can now retrieve the value of the authentication application name and the workspace name from the Terraform output.
 You can use them to authenticate to Azure ML and interact with the workspace using the `ezazml` CLI, 
 with a Contributor role by default on the Resource group containing all resources including Azure ML workspace.
-```bash
-- export AZURE_CLIENT_ID=<your_azure_client_id>
-- export AZURE_CLIENT_SECRET=<your_azure_client_secret>
+```dotenv
+AZURE_CLIENT_ID=<your_azure_client_id>
+AZURE_CLIENT_SECRET=<your_azure_client_secret>
 ```
 
 Azure portal: https://portal.azure.com/
@@ -262,26 +287,63 @@ It provides commands to create or update datastores, upload files to datastores,
 reference your training datasets. It provides several default use cases to simplify the process of setting up 
 your MLOPS Azure ML Workspace for training and inference jobs.
 
+### Prerequisites
+
+- Python >= 3.10  https://www.python.org/downloads/
+- Poetry          https://python-poetry.org/docs/
+
 ### Installation
 
-To install the package, clone the repository and run the following command:
-    
+To install the package, navigate to the `env/dev/` folder of this repository and run the following command:
+
 ```bash
-git clone https://github.com/basileazh/ezazml.git
+make install-dependencies
 ```
 
 Please activate you virtualenv before running the commands. If you are using Poetry, it can be done with `poetry shell`
 or by adding `poetry run` before any command.
 
+You should then be able to run the `ezazml` command in your terminal.
+
 ```bash
 ezazml --help
 ```
 
+If you use a `.env` file, add `dotenv` before every following `make`, `poetry run` or any `ezazml` 
+command in the `env/dev/` or `env/prd/` to load the environment variables. 
+You can also export the environment variables in the terminal.
+
 ### 1. Data initialization and update
 
-The following commands will create a `datastore` and a `mltable` objects in your Azure ML Workspace, making it ready for training and inference jobs.
+The following commands will create a `datastore` and a `mltable` objects in your Azure ML Workspace, making it ready 
+for training and inference jobs.
 
-#### 1.1 Create or update Azure ML datastore (from an ADLS container)
+#### 1.1 (Optional) Create or update Azure ML datastore (from an ADLS container)
+
+If your data is stored on Azure Data Lake Storage (ADLS), you should create or update a datastore pointing to the 
+ADLS container. 
+
+Please set the following environment variables:
+
+```dotenv
+# ADLS settings - if you want to use ADLS as a storage
+ADLS_ACTIVATE=True
+ADLS_ACCOUNT_KEY=<set_your_account_key>
+ABDS_NAME=<abds_name>
+ABDS_DESCRIPTION='Datastore pointing to a blob container using https protocol. From the Azure ML workspace.'
+ABDS_ACCOUNT_NAME=<set_your_account_name>
+ABDS_CONTAINER_NAME=<set_your_container_name>
+ABDS_PROTOCOL=https
+```
+
+Then run the following command:
+
+```bash
+make create-or-update-adls-datastore
+```
+
+Alternatively, you can run the following command without setting the environment variables:
+
 ```bash
 ezazml create-or-update-adls-datastore
 ```
@@ -299,6 +361,52 @@ ezazml upload-file-to-datastore <source_path> <dest_path_in_datastore> \
 #### 1.3 Create a MLTable to reference your training dataset
 
 A MLTable is a versioned Data Asset registered in Azure ML, enabling reproducibility, lineage and tracking.
+
+Please set the following environment variables:
+
+```dotenv
+# Azure ML settings
+AML_WORKSPACE_NAME=<your_workspace_name># The name of the Azure ML workspace. Available in the Azure portal.
+AML_RESOURCE_GROUP=<your_resource_group># The name of the Azure ML resource group. Available in the Azure portal.
+
+# Data settings
+DATA_PATH=<path_to_input_data># The path to the input data. Can be a local path, a URL, a path to a blob storage or a combination or list of these.
+DATA_INPUTS_EXTENSION=<csv,parquet,json,delta>
+DATA_MLTABLE_SAVE_PATH=<path_to_save_mltable>
+DATA_HEADERS=all_files_same_headers# Only for CSV. Other options are all_files_different_headers, from_first_file, no_header
+DATA_DESCRIPTION='My feature dataframe asset'
+DATA_INFER_COLUMN_TYPES_CSV=True# Only for CSV. Set to True to infer column types
+DATA_INPUT_KEEP_COLUMNS=# Comma-separated list of columns to keep
+DATA_INPUT_DROP_COLUMNS=# Comma-separated list of columns to drop
+
+# Databricks settings - if you want to use Databricks as a storage
+DATABRICKS_ACTIVATE=False
+DATABRICKS_HOST=<your_host_url>
+DATABRICKS_PAT=<your_token>
+DATABRICKS_DBFS_PREFIX=dbfs://
+```
+
+**Notes:**
+- The `DATA_PATH` can be a local path, a URL, a path to a blob storage or a combination or list of these. For example, 
+you can set `DATA_PATH` to `"https://github.com/datasciencedojo/datasets/blob/master/titanic.csv"` to download the
+Titanic dataset from GitHub. It is also possible to set `DATA_PATH` to a local path like `./data/titanic.csv` to use a
+local file. Finally, you can set `DATA_PATH` to a combination of these, like 
+`"./data/titanic_extra_data.csv,https://github.com/datasciencedojo/datasets/blob/master/titanic.csv"`.  
+- the `--infer-column-types` flag is only available for CSV files. It will infer the column types of the dataset. 
+To remove it, please go to the Makefile at the root of the repository and remove the `--infer-column-types` flag in the
+`create-mltable` command.
+- The `--include-path-column` flag is available to include the path column in the MLTable. To remove it, please go to the
+Makefile at the root of the repository and remove the `--include-path-column` flag in the `create-mltable` command.
+- The `--keep-columns` and `--drop-columns` options are available to keep or drop specific columns from the dataset. To avoid using them, 
+don't set them or set their values to an empty string.
+
+Then run the following command:
+    
+```bash
+make create-mltable
+```
+
+Alternatively, you can run the following command without setting the environment variables:
 
 ```bash
 ezazml create-mltable <source_path_1> <source_path_n> <save_path> \ 
@@ -328,47 +436,37 @@ ezazml create-mltable wasbs://data@azuremlexampledata.blob.core.windows.net/tita
 ### Logging
 
 The logging configuration is set in the `.env` file with the following environment variables:
-- `LOG_FILE_PATH`           The path to the log file
 - `LOG_FILE_PATH_TEMPLATE`  The path template to the log file  
 - `LOG_FORMAT`              The log format
 - `LOG_DATETIME_FORMAT`     The datetime format
 
 ## Deployment
 
-The best way to use this package is to use it in your CICD process.
+Once you have deployed all resources in the dev environment and you are satisfied with your setup,
+you can use this package in your CICD process for production deployment.
 An example of CICD pipeline is provided in the XXXXXX folder
-TODO: Add CICD example and describe here how to build one's. Using a public Docker image (from this repo) ? Using commands ? 
+
+##### TODO: Add CICD example and describe here how to build one's. Using a public Docker image (from this repo) ? Using commands ?
 
 ## Development
 
-### Prerequisites
+To contribute to this project, you can follow the following steps:
 
-- Python 3.10
-- Poetry
+1. Clone the repository
+2. Create a new branch
+3. Make your changes
+4. Run the tests
+5. Create a pull request
+6. Wait for the review
+7. Merge the pull request
+8. Celebrate
 
-### Installation
+### Run tests
 
-To install the package in development mode, navigate to the env/dev folder and run the following command:
+Here are the commands to run the package tests, and clean the integration tests outputs. They will ensure that all 
+operations run correctly. We recommend running them, then destroying the infrastructure and redeploying it to ensure 
+that the state is clean.
 
-```bash
-make install-dependencies
-```
-
-### Usage
-
-After installing the package, you have to set the environment variables in the `env/dev/.env` file or in the terminal.
-If you use dotenv, add `dotenv` before every following `make` command to load the environment variables.
-
-Please navigate to the `env/dev/` folder and run the following command:
-
-#### Initialize the Azure ML dev workspace
-
-The `env/dev/init_ws.sh` gives you an example of script to initialize the data assets of your workspace.
-Please change it the way it fits for your training dataset
-
-#### Run tests
-
-Here are the commands to run the tests, and clean the integration tests outputs:
 ```bash
 make run-tests
 make run-tests-cov

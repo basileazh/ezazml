@@ -1,5 +1,9 @@
+# Installation
+
 install-dependencies:
 	${MAKE} -C ../.. install-dependencies
+
+# Login
 
 login:
 	az login
@@ -9,11 +13,7 @@ login-spn:
 	az login --service-principal --tenant $(AZURE_TENANT_ID) -u $(AZURE_CLIENT_ID) -p $(AZURE_CLIENT_SECRET)
 	az account set -s $(AZURE_SUBSCRIPTION_ID)
 
-run-tests:
-	${MAKE} -C ../../ run-tests
-
-run-tests-cov:
-	${MAKE} -C ../../ run-tests-cov
+# Infrastructure as Code with Terraform
 
 tf-init:
 	${MAKE} -C ../../iac/ tf-init
@@ -38,3 +38,20 @@ tf-destroy:
 
 tf-destroy-aa:
 	${MAKE} -C ../../iac/ tf-destroy-aa
+
+# Azure ML Workspace Setup
+
+create-or-update-adls-datastore:
+	${MAKE} -C ../../ create-or-update-adls-datastore
+
+create-mltable:
+	${MAKE} -C ../../ create-mltable
+
+# Development
+
+run-tests:
+	${MAKE} -C ../../ run-tests
+
+run-tests-cov:
+	${MAKE} -C ../../ run-tests-cov
+

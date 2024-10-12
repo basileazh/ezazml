@@ -1,11 +1,30 @@
+# Installation
+
+.PHONY: install-dependencies
 install-dependencies:
 	echo "Installing dependencies..."
 	poetry install
 
-.PHONY: create-datastore
-create-datastore: install-dependencies
+# Azure ML Workspace Setup
+
+.PHONY: create-or-update-adls-datastore
+create-or-update-adls-datastore: install-dependencies
 	echo "Creating datastore..."
-	poetry run aml create-or-update-adls-datastore
+	poetry run ezazml create-or-update-adls-datastore
+
+.PHONY: create-mltable
+create-mltable: install-dependencies
+	echo "Creating MLTable..."
+	poetry run ezazml create-mltable $(DATA_PATH) $(DATA_MLTABLE_SAVE_PATH) \
+		--inputs-extension=$(DATA_INPUTS_EXTENSION) \
+		--data-description "$(DATA_DESCRIPTION)" \
+		--headers=$(DATA_HEADERS) \  # only for csv
+		--infer-column-types \  # only for csv, is a flag, remove it not to infer column types
+		# --include-path-column \  # is a flag, remove it not to include the path column
+		--keep-columns $(DATA_KEEP_COLUMNS) \
+		--drop-columns $(DATA_DROP_COLUMNS)
+
+# Development
 
 .PHONY: run-tests
 run-tests: install-dependencies
