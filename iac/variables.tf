@@ -1,29 +1,3 @@
-# Backend variables
-variable "backend_resource_name" {
-  type        = string
-  description = "Resource Name"
-  default     = "terraform-state-rg"
-}
-
-variable "backend_storage_account_name" {
-  type        = string
-  description = "Storage Account Name"
-  default     = "terraformbackendasa"
-}
-
-variable "backend_container_name" {
-  type        = string
-  description = "Container Name"
-  default     = "tfstate"
-}
-
-variable "backend_terraform_state_key" {
-  type        = string
-  description = "Terraform State Key"
-  default     = "terraform.tfstate"
-}
-
-
 # Auth variables
 
 variable "super_user_object_id" {
