@@ -15,6 +15,12 @@ resource "azurerm_storage_account" "default" {
   allow_nested_items_to_be_public = false
 }
 
+resource "azurerm_storage_container" "example" {
+  name                  = var.adls_container_name
+  storage_account_name  = azurerm_storage_account.default.name
+  container_access_type = "private"
+}
+
 resource "azurerm_container_registry" "default" {
   name                = "${var.resource_name_prefix}${terraform.workspace}acr01"
   location            = azurerm_resource_group.rg.location

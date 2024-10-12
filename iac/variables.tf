@@ -44,3 +44,11 @@ variable "resource_name_prefix" {
   description = "Prefix of the resource name"
   default     = "ml"
 }
+
+# Storage Account variables
+
+variable "adls_container_name" {
+  type        = string
+  description = "Name of the ADLS container"
+  default     = "main"
+}
