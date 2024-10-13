@@ -14,6 +14,16 @@ from pydantic_settings import (
 DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
+class AppSettings(BaseSettings):
+    """
+    App settings.
+    Values are read from environment variables.
+    """
+
+    EZAZML_REPOSITORY_URL: str = "https://github.com/basileazh/ezazml.git"
+    PROJECT_FOLDER_NAME: str = "ezazml"
+
+
 class AzureMLSettings(BaseSettings):
     """
     Azure ML settings.
@@ -79,6 +89,7 @@ class Settings:
     """
 
     # App settings
+    app: AppSettings = AppSettings()
     log: LoggingSettings = LoggingSettings()
 
     # Azure ML settings

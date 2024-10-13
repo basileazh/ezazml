@@ -24,8 +24,22 @@ def data_path():
 
 @pytest.fixture
 def temp_folder():
-    yield "temp/"
-    os.system('rm -rf "tests/temp/"')
+    try:
+        yield "temp/"
+    except Exception as e:
+        os.system('rm -rf "tests/temp/"')
+        os.system('rm -rf "tests/temp/"')
+        raise e
+
+
+def test_init(runner):
+    result = runner.invoke(cli, ["init"])
+
+    logger.info(result.output)
+    assert result.exit_code == 0
+
+    # Clean up
+    os.system('rm -rf "ezazml/"')
 
 
 def test_create_or_update_adls_datastore(runner):
@@ -37,7 +51,9 @@ def test_create_or_update_adls_datastore(runner):
 
 
 def test_create_mltable(runner, temp_folder):
-    input_paths = "wasbs://data@azuremlexampledata.blob.core.windows.net/titanic.csv"
+    data_path = "wasbs://data@azuremlexampledata.blob.core.windows.net/titanic.csv"
+    input_paths = r'[\{"file": "' + data_path + '"}'
+
     mltable_save_path = f"{temp_folder}titanic_mlt"
 
     result = runner.invoke(
@@ -45,7 +61,7 @@ def test_create_mltable(runner, temp_folder):
         [
             "create-mltable",
             input_paths,
-            mltable_save_path,
+            f"--mltable-save-path={mltable_save_path}",
             "--inputs-extension=csv",
             "--headers=all_files_same_headers",
             "--infer-column-types",
@@ -56,6 +72,42 @@ def test_create_mltable(runner, temp_folder):
     )
     logger.info(result.output)
     assert result.exit_code == 0
+
+
+def test_upload_file_and_create_mltable_from_datastore(runner, temp_folder, data_path):
+    result = runner.invoke(
+        cli,
+        [
+            "upload-file-to-datastore",
+            data_path,
+            temp_folder,
+            "--asset-type",
+            "uri_file",
+            "--overwrite",
+            "MERGE_WITH_OVERWRITE",
+        ],
+    )
+
+    logger.info(result.output)
+    assert result.exit_code == 0
+
+    input_paths = r'[\{"file": "' + data_path + '"}'
+    # Instructions: Create a mltable from input paths like '[{"file": "wasbs://<container>@<account>.blob.core.windows.net/<path>"}]' and save the mltable in the azure ml studio
+    # do not give mltable_save_path = f"{temp_folder}titanic_mlt_test"
+    result = runner.invoke(
+        cli,
+        [
+            "create-mltable",
+            input_paths,
+            f"--mltable-save-path=./{temp_folder}titanic_mlt_integration_test",
+            "--inputs-extension=csv",
+            "--headers=all_files_same_headers",
+            "--infer-column-types",
+            "--include-path-column",
+            "--keep-columns=col1,col2",
+            "--drop-columns=col3",
+        ],
+    )
 
 
 def test_create_dataset(runner, data_path):
@@ -90,24 +142,6 @@ def test_get_uri(runner, data_path):
     assert result.exit_code == 0
 
     result = runner.invoke(cli, ["get-uri", data_path, "--data-source=datastore"])
-
-    logger.info(result.output)
-    assert result.exit_code == 0
-
-
-def test_upload_file_to_datastore(runner, data_path, temp_folder):
-    result = runner.invoke(
-        cli,
-        [
-            "upload-file-to-datastore",
-            data_path,
-            temp_folder,
-            "--asset-type",
-            "uri_file",
-            "--overwrite",
-            "MERGE_WITH_OVERWRITE",
-        ],
-    )
 
     logger.info(result.output)
     assert result.exit_code == 0

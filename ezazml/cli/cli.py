@@ -6,12 +6,10 @@
 import click
 
 from ezazml.core.log import logger
+from ezazml.core.settings import get_settings
 from ezazml.services.data.data import AmlDataService
 from azure.ai.ml.constants import AssetTypes
 from ezazml.services.data.models import AMLFSOverwriteModeEnum
-
-# Initialize the data service
-data_service = AmlDataService()
 
 
 @click.group()
@@ -20,12 +18,43 @@ def cli():
     pass
 
 
+# ## Initialization Command ## #
+
+
+@cli.command()
+@click.option(
+    "--ezazml-repository-url",
+    default=get_settings().app.EZAZML_REPOSITORY_URL,
+    help="URL of the ezazml repository.",
+    type=click.STRING,
+)
+@click.option(
+    "--project-folder-name",
+    default=get_settings().app.PROJECT_FOLDER_NAME,
+    help="Name of the project folder.",
+    type=click.STRING,
+)
+def init(
+    ezazml_repository_url: str = get_settings().app.EZAZML_REPOSITORY_URL,
+    project_folder_name: str = get_settings().app.PROJECT_FOLDER_NAME,
+):
+    """Initialize the Azure Machine Learning Data Service"""
+    from git import Repo
+
+    # Clone the ezazml repository
+    Repo.clone_from(
+        get_settings().app.EZAZML_REPOSITORY_URL, get_settings().app.PROJECT_FOLDER_NAME
+    )
+
+
 # ## Data Service Commands ## #
 
 
 @cli.command()
 def create_or_update_adls_datastore():
     """Create or update an ADLS Gen2 datastore in Azure ML"""
+    # Initialize the data service
+    data_service = AmlDataService()
     try:
         store = data_service.create_or_update_adls_gen2_datastore()
         click.echo(f"ADLS Gen2 Datastore created/updated: {store.name}")
@@ -35,7 +64,12 @@ def create_or_update_adls_datastore():
 
 @cli.command()
 @click.argument("input_paths", nargs=-1, type=click.STRING)
-@click.argument("mltable-save-path", nargs=1, type=click.STRING)
+@click.option(
+    "--mltable-save-path",
+    default="mltable",
+    help="Path to save the mltable.",
+    type=click.STRING,
+)
 @click.option(
     "--inputs-extension",
     default="csv",
@@ -91,7 +125,7 @@ def create_or_update_adls_datastore():
 )
 def create_mltable(
     input_paths: list[str],
-    mltable_save_path: str,
+    mltable_save_path: str = "mltable",
     inputs_extension: str = "csv",
     headers: str = "all_files_same_headers",
     data_description: str | None = None,
@@ -103,6 +137,8 @@ def create_mltable(
     filter_lines: str | None = None,
 ):
     """Create a mltable from input paths like '[{"file": "wasbs://data@azuremlexampledata.blob.core.windows.net/titanic.csv"}]'"""
+    # Initialize the data service
+    data_service = AmlDataService()
 
     # Parsing arguments
 
@@ -155,6 +191,10 @@ def create_dataset(
     data_version: str | None = None,
 ):
     """Create a dataset in Azure ML"""
+
+    # Initialize the data service
+    data_service = AmlDataService()
+
     data_service.create_dataset(
         path=path,
         asset_type=asset_type,
@@ -198,6 +238,10 @@ def get_dataframe(
     data_features: str | None = None,
 ):
     """Get a Pandas DataFrame from a mltable, file, or folder"""
+
+    # Initialize the data service
+    data_service = AmlDataService()
+
     data_features_list = data_features.split(",") if data_features else None
     df = data_service.get_dataframe(
         mltable_name=mltable_name,
@@ -219,6 +263,10 @@ def get_dataframe(
 )
 def get_uri(path: str, data_source: str = "local"):
     """Get the URI of a file in the datastore or Databricks"""
+
+    # Initialize the data service
+    data_service = AmlDataService()
+
     uri = data_service.get_uri(path, data_source=data_source)
     click.echo(f"File URI: {uri}")
 
@@ -243,6 +291,10 @@ def upload_file_to_datastore(
     overwrite: str = AMLFSOverwriteModeEnum.overwrite,
 ):
     """Upload a file to the datastore"""
+
+    # Initialize the data service
+    data_service = AmlDataService()
+
     uri = data_service.upload_file_to_datastore(
         source_path=source_path,
         dest_path=dest_path,

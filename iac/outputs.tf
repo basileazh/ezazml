@@ -1,23 +1,27 @@
+output "application_client_id" {
+  value = azuread_application_registration.app.client_id
+}
+
 output "key_vault_name" {
   value = azurerm_key_vault.akv.name
 }
 
-output "storage_account_name" {
-  value = azurerm_storage_account.default.name
-}
-
-output "container_registry_name" {
-  value = azurerm_container_registry.default.name
+output "machine_learning_workspace_id" {
+  value = azurerm_machine_learning_workspace.default.id
 }
 
 output "machine_learning_workspace_name" {
   value = azurerm_machine_learning_workspace.default.name
 }
 
-output "machine_learning_compute_instance_name" {
-  value = azurerm_machine_learning_compute_instance.main.name
+output "storage_container_name" {
+  value = azurerm_storage_container.example.name
 }
 
-output "machine_learning_compute_cluster_name" {
-  value = azurerm_machine_learning_compute_cluster.compute.name
+output "container_registry_name" {
+  value = azurerm_container_registry.default.name
+}
+
+output "application_insights_name" {
+  value = azurerm_application_insights.default.name
 }

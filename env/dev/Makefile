@@ -55,3 +55,9 @@ run-tests:
 run-tests-cov:
 	${MAKE} -C ../../ run-tests-cov
 
+clean-tests-files:
+	${MAKE} -C ../../ clean-tests-files
+
+clean-pycache:
+	${MAKE} -C ../../ clean-pycache
+

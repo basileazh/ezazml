@@ -35,7 +35,7 @@ class AmlDataService:
     data_service = AmlDataService()
     """
 
-    datastore_uri_format = "azureml://subscriptions/{subscription}/resourcegroups/{resource_group}/workspaces/{workspace}/datastores/{datastore_name}/paths/{path_on_datastore}"
+    DATASTORE_URI_FORMAT = "azureml://subscriptions/{subscription}/resourcegroups/{resource_group}/workspaces/{workspace}/datastores/{datastore_name}/paths/{path_on_datastore}"
 
     def __init__(self):
         self.settings: Settings = get_settings()
@@ -177,13 +177,13 @@ class AmlDataService:
             tbl = mltable.from_paths(input_paths_mlt)
 
         # Filtering lines and columns with pyspark.sql like syntax
-        if filter_lines is not None:
+        if filter_lines:
             tbl = tbl.filter(filter_lines)
 
         # Filtering columns
-        if keep_columns is not None:
+        if keep_columns:
             tbl = tbl.keep_columns(keep_columns)
-        if drop_columns is not None:
+        if drop_columns:
             tbl = tbl.drop_columns(drop_columns)
 
         logger.info("mltable show: print(tbl.show())")
@@ -450,7 +450,7 @@ class AmlDataService:
         file_path = data_service.get_file_from_datastore_uri("data.csv")
         data = pd.read_csv(file_path)
         """
-        return self.datastore_uri_format.format(
+        return self.DATASTORE_URI_FORMAT.format(
             subscription=self.SUBSCRIPTION_ID,
             resource_group=self.RESOURCE_GROUP,
             workspace=self.WORKSPACE_NAME,

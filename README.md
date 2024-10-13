@@ -24,6 +24,10 @@
 [![Databricks](https://img.shields.io/badge/Databricks-SDK-blue)](https://pypi.org/project/databricks-cli/)
 [![Azure Data Lake Storage](https://img.shields.io/badge/Azure%20Data%20Lake%20Storage-SDK-blue)](https://pypi.org/project/azure-storage-file-datalake/)
 [![Azure Blob Storage](https://img.shields.io/badge/Azure%20Blob%20Storage-SDK-blue)](https://pypi.org/project/azure-storage-blob/)
+[![Terrform](https://img.shields.io/badge/Terraform-SDK-blue)](https://pypi.org/project/terraform/)
+[![Python](https://img.shields.io/badge/Python-3.10-blue)](https://www.python.org/downloads/)
+
+[//]: # ([![GitHub]&#40;https://img.shields.io/github/workflow/status/ezazml/ezazml/CI?label=CI&#41;]&#40;
 
 [//]: # ([![GitHub]&#40;https://img.shields.io/github/license/ezazml/ezazml&#41;]&#40;https://github.com/basileazh/ezazml/blob/main/LICENSE&#41;)
 
@@ -56,7 +60,40 @@ This project is licensed under the GNU GENERAL PUBLIC LICENSE - see the [LICENSE
 
 ## Installation
 
-To install the package, clone the repository and run the following command:
+### Prerequisites
+
+- Python >= 3.10  https://www.python.org/downloads/
+- Poetry          https://python-poetry.org/docs/
+
+
+### Installation
+
+To install the package, you can run the following command:
+
+```bash
+pip install ezazml
+```
+
+Then, to retrieve the template project folder please set the following environment variables in the `.env` file
+or export them in the terminal:
+
+```dotenv
+# Application settings
+EZAZML_REPOSITORY_URL="https://github.com/basileazh/ezazml.git"
+PROJECT_FOLDER_NAME=<project_folder_name>
+```
+
+And run the following command to retrieve the template project folder:
+
+```bash
+ezazml init 
+````
+
+The template project will de cloned from the `EZAZML_REPOSITORY_URL` in the `PROJECT_FOLDER_NAME` directory. You can then
+navigate to the `env/dev/` folder and start configuring the rest of the environment variables.
+
+Alternatively, you can clone the repository and navigate to the `env/dev/` folder to start configuring the 
+environment variables using the following command:
 
 ```bash
 git clone https://github.com/basileazh/ezazml.git
@@ -71,24 +108,45 @@ You can configure using a `.env` file or by exporting the environment variables 
 Here is how to create a `.env` file in the `env/prd/` or `env/dev/` directory of your project and add the following environment variables:
 
 ```dotenv
+# Application settings
+EZAZML_REPOSITORY_URL="https://github.com/basileazh/ezazml.git"
+PROJECT_FOLDER_NAME=<project_folder_name>
+
 # Auth settings
 AZURE_CLIENT_ID=<spn_client_ID># Service Principal client ID for auth to Azure. Available in the Azure portal and after the first Terraform apply iac deployment.
 AZURE_CLIENT_SECRET=<spn_client_secret># Service Principal secret for auth to Azure. Available in the Azure portal and after the first Terraform apply iac deployment.
 AZURE_TENANT_ID=<tenant_ID># Tenant ID for auth to Azure. Available in the Azure portal.
 AZURE_SUBSCRIPTION_ID=<subscription_ID># Subscription ID for auth to Azure. Available in the Azure portal.
 
-# Infrastructure settings
+## Terraform
+TF_OUTPUT_NAME=tf.tfplan
 TF_WORKSPACE=<dev># Other workspaces can be created by duplicating the structure in the env/ folder.
-TF_VAR_super_user_object_id=<super_user_object_id># The object ID of the super user. Can be found in the Azure portal.
-TF_VAR_tenant_id=<tenant_ID># Same as AZURE_TENANT_ID
+## Resource group
+TF_VAR_tenant_id==<tenant_ID># Same as AZURE_TENANT_ID
+TF_VAR_location=westeurope# The location of the to-be Azure resource. https://azure.microsoft.com/en-gb/explore/global-infrastructure/geographies/
+TF_VAR_resource_name_prefix=<resource_name_prefix># The prefix for the to-be resource names. Ex: "ezazml"
+## Authentication, users and spn
+TF_VAR_super_user_object_id==<super_user_object_id># The object ID of the super user. Can be found in the Azure portal.
 TF_VAR_auth_application_name_prefix=<auth_application_name># The full application name will be the concatenation of the auth_application_name and the workspace name
 TF_VAR_user_principal_name_prefix=<user_principal_name_prefix># The full user principal name will be the concatenation of the user_principal_name, '@' and the domain of the tenant
 TF_VAR_user_display_name=<user_display_name>
-TF_VAR_user_password=<user_password>
-TF_VAR_location=westeurope# The location of the to-be Azure resource. https://azure.microsoft.com/en-gb/explore/global-infrastructure/geographies/
-TF_VAR_resource_name_prefix=<resource_name_prefix># The prefix for the to-be resource names. Ex: "ezazml"
+TF_VAR_user_password=user_password>
+## Storage
 TF_VAR_adls_container_name=<adls_container_name># The name of the to-be ADLS container. Ex: "ezazml"
-TF_OUTPUT_NAME=tf.tfplan
+## Compute
+TF_VAR_compute_instance_size_dev="Standard_A1_v2"
+TF_VAR_compute_cluster_size_dev="Standard_A1_v2"
+TF_VAR_compute_cluster_size_prd="Standard_A1_v2"
+TF_VAR_compute_instance_count_dev=0
+TF_VAR_compute_instance_count_prd=0
+TF_VAR_compute_cluster_count_dev=1
+TF_VAR_compute_cluster_count_prd=1
+TF_VAR_compute_cluster_priority_dev="LowPriority"# LowPriority or Dedicated
+TF_VAR_compute_cluster_priority_prd="LowPriority"# LowPriority or Dedicated
+TF_VAR_compute_cluster_scale_min_node_dev=0
+TF_VAR_compute_cluster_scale_min_node_prd=0
+TF_VAR_compute_cluster_scale_max_node_dev=3
+TF_VAR_compute_cluster_scale_max_node_prd=3
 
 # Azure ML settings
 AML_WORKSPACE_NAME=<your_workspace_name># The name of the Azure ML workspace. Available in the Azure portal.
@@ -248,8 +306,6 @@ to the settings in the `providers.tf` file. Additionally, the `dev` workspace wi
 make tf-init
 ``` 
 
-##### TODO : Add the `env/prd/` folder and the `make tf-init` command to initialize the production workspace.
-
 **Note:** 
 - If your backend is configured to use Azure Data Lake Storage (ADLS), you will need to create the storage account 
 beforehand in a dedicated resource group.
@@ -290,6 +346,8 @@ This documentation provides the necessary steps to deploy Azure ML and associate
 ## Azure ML Workspace Management
 
 This package provides the `ezazml` CLI command to interact with your Azure ML Workspace. 
+We are going to set up the data assets and the model assets in the Azure ML Workspace. We are then going to deploy the 
+model as an always-on endpoint or to be used in a batch inference pipeline.
 
 ### Overview
 
@@ -347,7 +405,7 @@ ABDS_CONTAINER_NAME=<set_your_container_name>
 ABDS_PROTOCOL=https
 ```
 
-Then run the following command:
+Then run the following command (prepend `dotenv` if you are using a `.env` file):
 
 ```bash
 make create-or-update-adls-datastore
@@ -457,8 +515,6 @@ Once you have deployed all resources in the dev environment and you are satisfie
 you can use this package in your CICD process for production deployment.
 An example of CICD pipeline is provided in the XXXXXX folder
 
-##### TODO: Add CICD example and describe here how to build one's. Using a public Docker image (from this repo) ? Using commands ?
-
 ## Development
 
 To contribute to this project, you can follow the following steps:
@@ -483,3 +539,40 @@ make run-tests
 make run-tests-cov
 make clean-tests-files
 ```
+
+## TODO
+
+### Priority level 1 - HOT
+Bug fixes, critical improvements, current sprint tasks.
+
+-  Training
+  - Add a command to train a model in the Azure ML workspace.
+  - Add a command to register the model in the Azure ML workspace.
+  - Add a command to deploy the model as an always-on endpoint in the Azure ML workspace.
+  - Add a command to deploy the model in a batch inference pipeline in the Azure ML workspace.
+
+### Priority level 2 - WARM
+Medium issues, improvements, next sprint tasks.
+
+- Inference
+  - Add a command to run a batch inference pipeline in the Azure ML workspace.
+  - Add a command to run a batch inference pipeline in the Azure ML workspace with a model registered in the workspace.
+
+- Monitoring
+  - Add a command to set the monitoring configuration in the Azure ML workspace.
+  - Add a command to retrieve the monitoring logs of the Azure ML workspace.
+  - 
+### Priority level 3 - COLD
+Minor issues that can be fixed later, minor improvements, refactoring.
+
+- Documentation
+  - Add a section in the README.md file to explain how to deploy the package in a CICD pipeline.
+
+- Tests
+  - Repair tests in `tests/services/test_ml_client.py` and `tests/services/data/test_data.py`. 
+  Most issues seems to come from a bad use of mocking.
+
+- Terraform
+  - Add the `env/prd/` folder and the `make tf-init` command to initialize the production workspace.
+  - Some values are hardcoded in the Terraform code. They should be set as variables in the `variables.tf` file 
+  and declared as environment variables `TF_VAR_xxx` in the template `.env` file in the `README.md` file.

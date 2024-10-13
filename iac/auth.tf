@@ -1,6 +1,16 @@
-data "azuread_client_config" "current" {}
+# Super User Roles
 
+resource "azurerm_role_assignment" "akv_contributor_owner" {
+  principal_id         = azurerm_machine_learning_workspace.default.identity[0].principal_id
+  role_definition_name = "Owner"
+  scope                = azurerm_key_vault.akv.id
+}
+
+# Azure AD Authentication Application
+
+data "azuread_client_config" "current" {}
 # Retrieve domain information
+
 data "azuread_domains" "domains" {
   only_initial = true
 }
@@ -24,7 +34,7 @@ resource "azuread_service_principal" "spn" {
   owners                       = [data.azuread_client_config.current.object_id]
 }
 
-resource "azurerm_role_assignment" "rg_contributor" {
+resource "azurerm_role_assignment" "rg_contributor_spn" {
   principal_id         = azuread_service_principal.spn.object_id
   role_definition_name = "Contributor"
   scope                = azurerm_resource_group.rg.id

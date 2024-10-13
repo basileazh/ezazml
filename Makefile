@@ -15,26 +15,19 @@ create-or-update-adls-datastore: install-dependencies
 .PHONY: create-mltable
 create-mltable: install-dependencies
 	echo "Creating MLTable..."
-	poetry run ezazml create-mltable $(DATA_PATH) $(DATA_MLTABLE_SAVE_PATH) \
+	poetry run ezazml create-mltable $(DATA_PATH) \
+		--mltable-save-path=$(DATA_MLTABLE_SAVE_PATH) \
 		--inputs-extension=$(DATA_INPUTS_EXTENSION) \
 		--data-description "$(DATA_DESCRIPTION)" \
-		--headers=$(DATA_HEADERS) \  # only for csv
-		--infer-column-types \  # only for csv, is a flag, remove it not to infer column types
-		# --include-path-column \  # is a flag, remove it not to include the path column
+		--headers=$(DATA_HEADERS) \
+		--infer-column-types \
 		--keep-columns $(DATA_KEEP_COLUMNS) \
 		--drop-columns $(DATA_DROP_COLUMNS)
+# --include-path-column \  # is a flag, remove it not to include the path column
 
 # Development
 
-.PHONY: run-tests
-run-tests: install-dependencies
-	echo "Running tests..."
-	poetry run pytest tests/ -v -s
-
-.PHONY: run-tests-cov
-run-tests-cov: install-dependencies
-	echo "Running tests with coverage..."
-	poetry run pytest tests/ -v -s --cov=src --cov-report=term-missing
+.PHONY: clean-pycache
 
 .PHONY: clean-tests-files
 clean-tests-files:
@@ -44,3 +37,19 @@ clean-tests-files:
 	rm -rf tests/.coverage
 	rm -rf tests/temp/
 	rm -rf "tests/temp/"
+
+clean-pycache:
+	echo "Cleaning pycache files..."
+	find . -name "__pycache__" -exec rm -rf {} +
+	find . -name ".pytest_cache" -exec rm -rf {} +
+	pytest --cache-clear
+
+.PHONY: run-tests
+run-tests: install-dependencies clean-tests-files clean-pycache
+	echo "Running tests..."
+	poetry run pytest tests/ -v -s
+
+.PHONY: run-tests-cov
+run-tests-cov: install-dependencies clean-tests-files clean-pycache
+	echo "Running tests with coverage..."
+	poetry run pytest tests/ -v -s --cov=src --cov-report=term-missing
