@@ -61,6 +61,28 @@ class AmlDataService:
         self.DATABRICKS_PAT: str = self.settings.databricks.DATABRICKS_PAT
         self.DBFS_PREFIX: str = self.settings.databricks.DATABRICKS_DBFS_PREFIX
 
+    def preprocess_mltable(self, tbl: mltable) -> mltable:
+        """
+        **** ****
+        **** CHANGE THIS FUNCTION TO ADD YOUR OWN PREPROCESSING STEPS ****
+        **** ****
+
+        Apply preprocessing steps to the mltable.
+        :param tbl: The mltable to preprocess.
+        :type tbl: mltable
+        :return: The preprocessed mltable.
+        :rtype: mltable
+
+        Example usage:
+        data_service = AmlDataService()
+        tbl = data_service.preprocess_mltable(tbl)
+        """
+        # Add your preprocessing steps here
+        # tbl = tbl.drop_columns(["column_to_drop"])
+        # tbl = tbl.fillna(0)
+
+        return tbl
+
     def create_or_update_adls_gen2_datastore(self) -> AzureBlobDatastore:
         """
         Create an ADLS Gen2 datastore in Azure ML that references an ADLS Gen2 account.
@@ -185,6 +207,9 @@ class AmlDataService:
             tbl = tbl.keep_columns(keep_columns)
         if drop_columns:
             tbl = tbl.drop_columns(drop_columns)
+
+        # Apply other transformations
+        tbl = self.preprocess_mltable(tbl)
 
         logger.info("mltable show: print(tbl.show())")
 
