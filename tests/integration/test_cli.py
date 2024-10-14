@@ -52,7 +52,7 @@ def test_create_or_update_adls_datastore(runner):
 
 def test_create_mltable(runner, temp_folder):
     data_path = "wasbs://data@azuremlexampledata.blob.core.windows.net/titanic.csv"
-    input_paths = r'[\{"file": "' + data_path + '"}'
+    input_paths = data_path
 
     mltable_save_path = f"{temp_folder}titanic_mlt"
 
@@ -91,7 +91,7 @@ def test_upload_file_and_create_mltable_from_datastore(runner, temp_folder, data
     logger.info(result.output)
     assert result.exit_code == 0
 
-    input_paths = r'[\{"file": "' + data_path + '"}'
+    input_paths = data_path
     # Instructions: Create a mltable from input paths like '[{"file": "wasbs://<container>@<account>.blob.core.windows.net/<path>"}]' and save the mltable in the azure ml studio
     # do not give mltable_save_path = f"{temp_folder}titanic_mlt_test"
     result = runner.invoke(
