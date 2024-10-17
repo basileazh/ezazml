@@ -47,7 +47,11 @@ name: 'deploy_infra_terraform'
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'iac/**/*.tf'  # Only trigger on changes to .tf files in the iac folder
   pull_request:
+    paths:
+      - 'iac/**/*.tf'  # Only trigger on changes to .tf files in the iac folder
 
 permissions:
   contents: read
@@ -68,7 +72,7 @@ jobs:
       TF_OUTPUT_NAME: "tf.tfplan"
       TF_WORKSPACE: "dev"
       ## Resource group
-      TF_VAR_tenant_id: ${{ secrets.TF_VAR_TENANT_ID }}
+      TF_VAR_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
       TF_VAR_location: "westeurope"
       TF_VAR_resource_name_prefix: "ezazml"
       ## Authentication, users and spn
