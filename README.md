@@ -256,19 +256,36 @@ Set the following environment variables in the `.env` file or export them in the
 `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` are available in the Azure portal. All other variables can be set according
 to your requirements. See the previous section for a detailed explanation of each variable. 
 ```dotenv
-AZURE_TENANT_ID=<your_azure_tenant_id>
-AZURE_SUBSCRIPTION_ID=<your_azure_subscription_id>
-TF_WORKSPACE=<terraform_workspace>
-TF_VAR_super_user_object_id=<super_user_object_id>
-TF_VAR_tenant_id=<tenant_id>
-TF_VAR_auth_application_name_prefix=<application_name_prefix>
-TF_VAR_user_principal_name_prefix=<user_principal_name_prefix>
-TF_VAR_user_display_name=<user_display_name>
-TF_VAR_user_password=<user_password>
-TF_VAR_location=<location>
-TF_VAR_resource_name_prefix=<resource_name_prefix>
-TF_VAR_adls_container_name=<adls_container_name>
-TF_OUTPUT_PATH=<path_to_store_terraform_output>
+# Infrastructure settings
+## Terraform
+TF_OUTPUT_NAME: "tf.tfplan"
+TF_WORKSPACE: "dev"
+## Resource group
+TF_VAR_tenant_id: ${{ secrets.TF_VAR_TENANT_ID }}
+TF_VAR_location: "westeurope"
+TF_VAR_resource_name_prefix: "ezazml"
+## Authentication, users and spn
+TF_VAR_super_user_object_id: ${{ secrets.TF_VAR_SUPER_USER_OBJECT_ID }}
+TF_VAR_auth_application_name_prefix: "ezazml-app"
+TF_VAR_user_principal_name_prefix: "user1"
+TF_VAR_user_display_name: "User 1"
+TF_VAR_user_password: ${{ secrets.TF_VAR_USER_PASSWORD }}
+## Storage
+TF_VAR_adls_container_name: "ezazml"
+## Compute
+TF_VAR_compute_instance_size_dev: "Standard_A1_v2"
+TF_VAR_compute_cluster_size_dev: "STANDARD_DS2_V2"
+TF_VAR_compute_cluster_size_prd: "Standard_A1_v2"
+TF_VAR_compute_instance_count_dev: "0"
+TF_VAR_compute_instance_count_prd: "0"
+TF_VAR_compute_cluster_count_dev: "1"
+TF_VAR_compute_cluster_count_prd: "1"
+TF_VAR_compute_cluster_priority_dev: "Dedicated"
+TF_VAR_compute_cluster_priority_prd: "LowPriority"
+TF_VAR_compute_cluster_scale_min_node_dev: "0"
+TF_VAR_compute_cluster_scale_min_node_prd: "0"
+TF_VAR_compute_cluster_scale_max_node_dev: "3"
+TF_VAR_compute_cluster_scale_max_node_prd: "3"
 ```
 If you are using a `.env` file, ensure that the file is present in the environment folder and contains the required 
 environment variables and set their values accordingly. 
