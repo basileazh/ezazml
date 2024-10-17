@@ -47,7 +47,11 @@ name: 'deploy_infra_terraform'
 on:
   push:
     branches: [ "main" ]
+    paths:
+      - 'iac/**/*.tf'  # Only trigger on changes to .tf files in the iac folder
   pull_request:
+    paths:
+      - 'iac/**/*.tf'  # Only trigger on changes to .tf files in the iac folder
 
 permissions:
   contents: read
