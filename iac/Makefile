@@ -1,5 +1,4 @@
-.PHONY: tf-init tf-plan tf-apply login-spn tf-import-rg
-
+.PHONY: tf-init tf-select-ws tf-upgrade tf-import-rg tf-import-aml tf-plan-no-input tf-plan-output tf-apply tf-apply-aa tf-destroy tf-destroy-aa
 tf-init:
 	terraform init
 	terraform workspace new $(TF_WORKSPACE) ||
@@ -17,7 +16,14 @@ tf-import-rg:
 tf-import-aml:
 	terraform import -var-file="${TF_VAR_FILE_PATH}" azurerm_machine_learning_workspace.default /subscriptions/$(AZURE_SUBSCRIPTION_ID)/resourceGroups/$(AML_RESOURCE_GROUP)/providers/Microsoft.MachineLearningServices/workspaces/$(AML_WORKSPACE_NAME)
 
-tf-plan:
+tf-plan-no-input:
+	terraform plan -input=false
+
+tf-fmt-check:
+	terraform fmt -check
+
+tf-plan-output:
+	terraform fmt
 	terraform plan -out "../env/$(TF_WORKSPACE)/$(TF_OUTPUT_NAME)"
 
 tf-apply:
@@ -25,6 +31,9 @@ tf-apply:
 
 tf-apply-aa:
 	terraform apply -auto-approve
+
+tf-apply-aa-no-input:
+	terraform apply -auto-approve -input=false
 
 tf-destroy:
 	terraform destroy
