@@ -52,6 +52,7 @@ on:
   pull_request:
     paths:
       - 'iac/**/*.tf'  # Only trigger on changes to .tf files in the iac folder
+  workflow_dispatch:  # Allow manual triggering from GitHub Actions UI
 
 permissions:
   contents: read
