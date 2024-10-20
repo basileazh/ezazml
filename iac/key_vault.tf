@@ -39,12 +39,6 @@ resource "azurerm_key_vault_secret" "client_secret" {
 
 # Give the Super User / DevOPS SPN access to the Key Vault
 
-resource "azurerm_role_assignment" "akv_contributor_su" {
-  principal_id         = var.super_user_object_id
-  role_definition_name = "Contributor"
-  scope                = azurerm_key_vault.akv.id
-}
-
 resource "azurerm_role_assignment" "akv_kv_contributor_su" {
   principal_id         = var.super_user_object_id
   role_definition_name = "Key Vault Contributor"
@@ -65,12 +59,6 @@ resource "azurerm_key_vault_access_policy" "akv_access_policy_su" {
 }
 
 # Give the Azure Machine Learning Workspace Contributor access to the Key Vault
-
-resource "azurerm_role_assignment" "akv_contributor_aml" {
-  principal_id         = azurerm_machine_learning_workspace.default.identity[0].principal_id
-  role_definition_name = "Contributor"
-  scope                = azurerm_key_vault.akv.id
-}
 
 resource "azurerm_role_assignment" "akv_kv_contributor_aml" {
   principal_id         = azurerm_machine_learning_workspace.default.identity[0].principal_id

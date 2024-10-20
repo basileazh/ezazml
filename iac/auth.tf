@@ -1,11 +1,3 @@
-# Super User Roles
-
-resource "azurerm_role_assignment" "akv_contributor_owner" {
-  principal_id         = azurerm_machine_learning_workspace.default.identity[0].principal_id
-  role_definition_name = "Owner"
-  scope                = azurerm_key_vault.akv.id
-}
-
 # Azure AD Authentication Application
 
 data "azuread_client_config" "current" {}
