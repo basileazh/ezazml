@@ -26,17 +26,17 @@ resource "azurerm_key_vault" "akv" {
 
 # Create 2 secrets in the Key Vault
 
-resource "azurerm_key_vault_secret" "client_id" {
-  name         = "spn-client-id"
-  value        = azuread_application_registration.app.id
-  key_vault_id = azurerm_key_vault.akv.id
-}
-
-resource "azurerm_key_vault_secret" "client_secret" {
-  name         = "spn-client-secret"
-  value        = azuread_application_password.app_secret.value
-  key_vault_id = azurerm_key_vault.akv.id
-}
+# resource "azurerm_key_vault_secret" "client_id" {
+#   name         = "spn-client-id"
+#   value        = azuread_application_registration.app.id
+#   key_vault_id = azurerm_key_vault.akv.id
+# }
+#
+# resource "azurerm_key_vault_secret" "client_secret" {
+#   name         = "spn-client-secret"
+#   value        = azuread_application_password.app_secret.value
+#   key_vault_id = azurerm_key_vault.akv.id
+# }
 
 # Give the Super User / DevOPS SPN access to the Key Vault as a Key Vault Contributor
 
