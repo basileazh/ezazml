@@ -1,9 +1,4 @@
 # Auth variables
-variable "directory_object_id" {
-  type        = string
-  description = "Azure Directory Object ID"
-}
-
 variable "super_user_object_id" {
   type        = string
   description = "Super User Object ID"
