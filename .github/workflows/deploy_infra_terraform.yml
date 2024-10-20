@@ -66,17 +66,17 @@ jobs:
     environment: dev
     env:
       # Auth settings (Sensitive - use secrets)
-      AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-      AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      AZURE_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
       
       # Infrastructure settings
       ## Terraform
       TF_OUTPUT_NAME: "tf.tfplan"
       TF_WORKSPACE: "dev"
       ## Resource group
-      TF_VAR_tenant_id: ${{ secrets.AZURE_TENANT_ID }}
+      TF_VAR_tenant_id: ${{ secrets.ARM_TENANT_ID }}
       TF_VAR_location: "westeurope"
       TF_VAR_resource_name_prefix: "ezazml"
       ## Authentication, users and spn
@@ -123,21 +123,18 @@ jobs:
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
       run: 
-        make login-spn &&
         make tf-init
       working-directory: env/dev
 
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
       run: 
-        make login-spn &&
         make tf-fmt-check
       working-directory: env/dev
 
     # Generates an execution plan for Terraform
     - name: Terraform Format and Plan
       run: 
-        make login-spn &&
         make tf-plan-no-input
       working-directory: env/dev
 
@@ -145,6 +142,5 @@ jobs:
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: 
-        make login-spn &&
         make tf-apply-aa-no-input
       working-directory: env/dev

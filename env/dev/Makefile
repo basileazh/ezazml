@@ -6,12 +6,12 @@ install-dependencies:
 # Login
 
 login:
+	az account set -s $(ARM_SUBSCRIPTION_ID)
 	az login
-	az account set -s $(AZURE_SUBSCRIPTION_ID)
 
 login-spn:
-	az login --service-principal --tenant $(AZURE_TENANT_ID) -u $(AZURE_CLIENT_ID) -p $(AZURE_CLIENT_SECRET)
-	az account set -s $(AZURE_SUBSCRIPTION_ID)
+	az account set -s $(ARM_SUBSCRIPTION_ID)
+	az login --service-principal --tenant $(ARM_TENANT_ID) -u $(ARM_CLIENT_ID) -p $(ARM_CLIENT_SECRET)
 
 # Infrastructure as Code with Terraform
 

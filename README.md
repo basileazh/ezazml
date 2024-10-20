@@ -113,16 +113,16 @@ EZAZML_REPOSITORY_URL="https://github.com/basileazh/ezazml.git"
 PROJECT_FOLDER_NAME=<project_folder_name>
 
 # Auth settings
-AZURE_CLIENT_ID=<spn_client_ID># Service Principal client ID for auth to Azure. Available in the Azure portal and after the first Terraform apply iac deployment.
-AZURE_CLIENT_SECRET=<spn_client_secret># Service Principal secret for auth to Azure. Available in the Azure portal and after the first Terraform apply iac deployment.
-AZURE_TENANT_ID=<tenant_ID># Tenant ID for auth to Azure. Available in the Azure portal.
-AZURE_SUBSCRIPTION_ID=<subscription_ID># Subscription ID for auth to Azure. Available in the Azure portal.
+ARM_CLIENT_ID=<spn_client_ID># Service Principal client ID for auth to Azure. Available in the Azure portal and after the first Terraform apply iac deployment.
+ARM_CLIENT_SECRET=<spn_client_secret># Service Principal secret for auth to Azure. Available in the Azure portal and after the first Terraform apply iac deployment.
+ARM_TENANT_ID=<tenant_ID># Tenant ID for auth to Azure. Available in the Azure portal.
+ARM_SUBSCRIPTION_ID=<subscription_ID># Subscription ID for auth to Azure. Available in the Azure portal.
 
 ## Terraform
 TF_OUTPUT_NAME=tf.tfplan
 TF_WORKSPACE=<dev># Other workspaces can be created by duplicating the structure in the env/ folder.
 ## Resource group
-TF_VAR_tenant_id==<tenant_ID># Same as AZURE_TENANT_ID
+TF_VAR_tenant_id==<tenant_ID># Same as ARM_TENANT_ID
 TF_VAR_location=westeurope# The location of the to-be Azure resource. https://azure.microsoft.com/en-gb/explore/global-infrastructure/geographies/
 TF_VAR_resource_name_prefix=<resource_name_prefix># The prefix for the to-be resource names. Ex: "ezazml"
 ## Authentication, users and spn
@@ -253,7 +253,7 @@ variables in a `.env` file there.
 #### Step 2: Set Environment Variables
 
 Set the following environment variables in the `.env` file or export them in the terminal.
-`AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` are available in the Azure portal. All other variables can be set according
+`ARM_TENANT_ID`, `ARM_SUBSCRIPTION_ID` are available in the Azure portal. All other variables can be set according
 to your requirements. See the previous section for a detailed explanation of each variable. 
 ```dotenv
 # Infrastructure settings
@@ -303,8 +303,8 @@ make login
 - **Using Service Principal:**
 If you are logging in using a service principal, make sure to set the following environment variables:
 ```dotenv
-AZURE_CLIENT_ID=<your_azure_client_id>
-AZURE_CLIENT_SECRET=<your_azure_client_secret>
+ARM_CLIENT_ID=<your_azure_client_id>
+ARM_CLIENT_SECRET=<your_azure_client_secret>
 ```
 If you retrieved the service principal credentials from a previous deployment, you can set them as environment variables 
 with a Contributor role by default on the Resource group containing all resources including Azure ML workspace.
@@ -350,8 +350,8 @@ You can now retrieve the value of the authentication application name and the wo
 You can use them to authenticate to Azure ML and interact with the workspace using the `ezazml` CLI, 
 with a Contributor role by default on the Resource group containing all resources including Azure ML workspace.
 ```dotenv
-AZURE_CLIENT_ID=<your_azure_client_id>
-AZURE_CLIENT_SECRET=<your_azure_client_secret>
+ARM_CLIENT_ID=<your_azure_client_id>
+ARM_CLIENT_SECRET=<your_azure_client_secret>
 ```
 
 Azure portal: https://portal.azure.com/
@@ -414,7 +414,7 @@ Please set the following environment variables:
 ```dotenv
 # ADLS settings - if you want to use ADLS as a storage
 ADLS_ACTIVATE=True
-ADLS_ACCOUNT_KEY=<set_your_account_key>
+ADLS_ACCOUNT_KEY=<set_your_accoug6nt_key>
 ABDS_NAME=<abds_name>
 ABDS_DESCRIPTION='Datastore pointing to a blob container using https protocol. From the Azure ML workspace.'
 ABDS_ACCOUNT_NAME=<set_your_account_name>
