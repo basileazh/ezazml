@@ -1,5 +1,12 @@
 .PHONY: tf-init tf-select-ws tf-upgrade tf-import-rg tf-import-aml tf-plan-no-input tf-plan-output tf-apply tf-apply-aa tf-destroy tf-destroy-aa
+
+TF_WORKSPACE ?= dev
+TF_OUTPUT_NAME ?= tfplan
+
 tf-init:
+	terraform init
+
+tf-init-ws:
 	terraform init
 	terraform workspace select $(TF_WORKSPACE) || terraform workspace new $(TF_WORKSPACE)
 
@@ -10,10 +17,10 @@ tf-upgrade:
 	terraform init -upgrade
 
 tf-import-rg:
-	terraform import -var-file="${TF_VAR_FILE_PATH}" azurerm_resource_group.default /subscriptions/$(AZURE_SUBSCRIPTION_ID)/resourceGroups/$(AML_RESOURCE_GROUP)
+	terraform import -var-file="${TF_VAR_FILE_PATH}" azurerm_resource_group.default /subscriptions/$(ARM_SUBSCRIPTION_ID)/resourceGroups/$(AML_RESOURCE_GROUP)
 
 tf-import-aml:
-	terraform import -var-file="${TF_VAR_FILE_PATH}" azurerm_machine_learning_workspace.default /subscriptions/$(AZURE_SUBSCRIPTION_ID)/resourceGroups/$(AML_RESOURCE_GROUP)/providers/Microsoft.MachineLearningServices/workspaces/$(AML_WORKSPACE_NAME)
+	terraform import -var-file="${TF_VAR_FILE_PATH}" azurerm_machine_learning_workspace.default /subscriptions/$(ARM_SUBSCRIPTION_ID)/resourceGroups/$(AML_RESOURCE_GROUP)/providers/Microsoft.MachineLearningServices/workspaces/$(AML_WORKSPACE_NAME)
 
 tf-plan-no-input:
 	terraform plan -input=false
