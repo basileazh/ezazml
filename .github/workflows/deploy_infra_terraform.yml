@@ -123,21 +123,21 @@ jobs:
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
       run: 
-        make login-spn
+        make login-spn &&
         make tf-init
       working-directory: env/dev
 
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Format
       run: 
-        make login-spn
+        make login-spn &&
         make tf-fmt-check
       working-directory: env/dev
 
     # Generates an execution plan for Terraform
     - name: Terraform Format and Plan
       run: 
-        make login-spn
+        make login-spn &&
         make tf-plan-no-input
       working-directory: env/dev
 
@@ -145,6 +145,6 @@ jobs:
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: 
-        make login-spn
+        make login-spn &&
         make tf-apply-aa-no-input
       working-directory: env/dev
