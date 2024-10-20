@@ -1,7 +1,7 @@
 .PHONY: tf-init tf-select-ws tf-upgrade tf-import-rg tf-import-aml tf-plan-no-input tf-plan-output tf-apply tf-apply-aa tf-destroy tf-destroy-aa
 tf-init:
 	terraform init
-	terraform workspace new $(TF_WORKSPACE) ||
+	terraform workspace new $(TF_WORKSPACE)
 	terraform workspace select $(TF_WORKSPACE)
 
 tf-select-ws:
