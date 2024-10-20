@@ -80,6 +80,7 @@ jobs:
       TF_VAR_location: "westeurope"
       TF_VAR_resource_name_prefix: "ezazml"
       ## Authentication, users and spn
+      TF_VAR_directory_object_id: ${{ secrets.TF_VAR_directory_object_id }}
       TF_VAR_super_user_object_id: ${{ secrets.TF_VAR_super_user_object_id }}
       TF_VAR_auth_application_name_prefix: "ezazml-app"
       TF_VAR_user_principal_name_prefix: "user1"

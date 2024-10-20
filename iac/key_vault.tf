@@ -22,6 +22,13 @@ resource "azurerm_key_vault" "akv" {
 
     secret_permissions = ["Set", "Get", "List"]
   }
+
+  access_policy {
+    tenant_id = var.tenant_id
+    object_id = var.directory_object_id
+
+    secret_permissions = ["Set", "Get", "List"]
+  }
 }
 
 # Create 2 secrets in the Key Vault
