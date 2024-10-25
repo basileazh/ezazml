@@ -34,7 +34,7 @@ tf-fmt-check:
 	${MAKE} -C ../../iac/ tf-fmt-check
 
 tf-plan-output:
-	${MAKE} -C ../../iac/ tf-plan
+	${MAKE} -C ../../iac/ tf-plan-output
 
 tf-apply:
 	${MAKE} -C ../../iac/ tf-apply
