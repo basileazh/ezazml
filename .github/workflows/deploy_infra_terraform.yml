@@ -80,7 +80,7 @@ jobs:
       TF_VAR_location: "westeurope"
       TF_VAR_resource_name_prefix: "ezazml"
       ## Authentication, users and spn
-      TF_VAR_super_user_object_id: ${{ secrets.TF_VAR_super_user_object_id }}
+      TF_VAR_super_devops_spn_object_id: ${{ secrets.TF_VAR_SUPER_DEVOPS_SPN_OBJECT_ID }}
       TF_VAR_auth_application_name_prefix: "ezazml-app"
       TF_VAR_user_principal_name_prefix: "user1"
       TF_VAR_user_display_name: "User 1"
@@ -133,8 +133,8 @@ jobs:
       working-directory: env/dev
 
     # Generates an execution plan for Terraform
-    - name: Terraform Format and Plan
-      run: 
+    - name: Terraform Plan
+      run:
         make tf-plan-no-input
       working-directory: env/dev
 

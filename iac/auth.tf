@@ -17,7 +17,7 @@ resource "azuread_application_password" "app_secret" {
 
 resource "azuread_application_owner" "example" {
   application_id  = azuread_application_registration.app.id
-  owner_object_id = var.super_user_object_id
+  owner_object_id = var.super_devops_spn_object_id
 }
 
 resource "azuread_service_principal" "spn" {

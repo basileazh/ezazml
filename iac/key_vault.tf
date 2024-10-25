@@ -11,7 +11,7 @@ resource "azurerm_key_vault" "akv" {
   # Grant access to the Key Vault for the Super User, the RG DevOPS SPN and Azure Machine Learning Workspace
   access_policy {
     tenant_id = var.tenant_id
-    object_id = var.super_user_object_id
+    object_id = var.super_devops_spn_object_id
 
     secret_permissions = ["Get", "List", "Set", "Delete", "Recover", "Backup", "Restore", "Purge"]
   }
@@ -41,7 +41,7 @@ resource "azurerm_key_vault" "akv" {
 # Give the Super User / DevOPS SPN access to the Key Vault as a Key Vault Contributor
 
 resource "azurerm_role_assignment" "akv_kv_contributor_su" {
-  principal_id         = var.super_user_object_id
+  principal_id         = var.super_devops_spn_object_id
   role_definition_name = "Key Vault Contributor"
   scope                = azurerm_key_vault.akv.id
 }

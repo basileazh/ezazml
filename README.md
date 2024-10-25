@@ -126,7 +126,7 @@ TF_VAR_tenant_id==<tenant_ID># Same as ARM_TENANT_ID
 TF_VAR_location=westeurope# The location of the to-be Azure resource. https://azure.microsoft.com/en-gb/explore/global-infrastructure/geographies/
 TF_VAR_resource_name_prefix=<resource_name_prefix># The prefix for the to-be resource names. Ex: "ezazml"
 ## Authentication, users and spn
-TF_VAR_super_user_object_id==<super_user_object_id># The object ID of the super user. Can be found in the Azure portal.
+TF_VAR_super_devops_spn_object_id==<super_devops_spn_object_id># The object ID of the super user. Can be found in the Azure portal.
 TF_VAR_auth_application_name_prefix=<auth_application_name># The full application name will be the concatenation of the auth_application_name and the workspace name
 TF_VAR_user_principal_name_prefix=<user_principal_name_prefix># The full user principal name will be the concatenation of the user_principal_name, '@' and the domain of the tenant
 TF_VAR_user_display_name=<user_display_name>
@@ -214,6 +214,24 @@ https://learn.hashicorp.com/tutorials/terraform/install-cli
 https://docs.microsoft.com/en-us/azure/storage/blobs/data-lake-storage-introduction
 - Environment variables set in the `.env` file or exported in the terminal
 
+### Super DevOPS Application SPN
+
+To deploy the infrastructure, you will need to create a Super DevOPS Application associated with a 
+Service Principal (SPN) in Azure. The Super DevOPS SPN will be used to authenticate to Azure and deploy the resources.
+The application should have the `Contributor` and `Role Based Access Control Administrator` roles on the Subscription, 
+and be granted the following API permissions in Entra ID : 
+- `Application.ReadWrite.OwnedBy`
+- `Directory.Read.All`
+- `User.Read`
+- `User.ReadWrite.All`
+
+We will use this SPN for the first deployment, then we will use a Project DevOPS SPN that will be created during this first 
+deployment and that will have the `Contributor` role on the Resource group containing all resources including 
+Azure ML workspace. This allows us to restrict the permissions of the SPN to the 
+scope of the Azure ML workspace. This can be done by following instructions at this page : 
+https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/guides/service_principal_client_secret
+
+
 ### Terraform Backend Configuration
 
 The Terraform backend is configured to use Azure Data Lake Storage (ADLS) as the backend storage.
@@ -229,16 +247,16 @@ To configure the backend, open the `iac/providers.tf` file and set the following
 
 ### Services Defined in Terraform Code
 The Terraform configuration in this package deploys the following services:
-- Azure Machine Learning Instance
-- 1 Resource Group containing all resources
-- 1 Storage Account with Blob Container
-- 1 Application and Service Principal
-- 1 User registered in Azure AD and to the application
-- 1 Key Vault with 2 secrets
-  - 1 for the application client_id
-  - 1 for the application password
-- 1 Container Registry
-- 1 Application Insights
+- Machine Learning Workspace
+- Resource Group containing all resources
+- Storage Account with Blob Container
+- Application and Service Principal
+- User registered in Azure AD and to the application
+- Key Vault with 2 secrets
+  - application (SPN) client_id
+  - application (SPN) password
+- Container Registry
+- Application Insights
 
   
 ### Instructions for Deployment
@@ -255,37 +273,42 @@ variables in a `.env` file there.
 Set the following environment variables in the `.env` file or export them in the terminal.
 `ARM_TENANT_ID`, `ARM_SUBSCRIPTION_ID` are available in the Azure portal. All other variables can be set according
 to your requirements. See the previous section for a detailed explanation of each variable. 
+
 ```dotenv
+# Auth settings
+ARM_TENANT_ID=<tenant_ID>
+ARM_SUBSCRIPTION_ID=<subscription_ID>
+
 # Infrastructure settings
 ## Terraform
 TF_OUTPUT_NAME: "tf.tfplan"
 TF_WORKSPACE: "dev"
 ## Resource group
-TF_VAR_tenant_id: ${{ secrets.TF_VAR_TENANT_ID }}
-TF_VAR_location: "westeurope"
-TF_VAR_resource_name_prefix: "ezazml"
+TF_VAR_tenant_id=<tenant_ID>
+TF_VAR_location="westeurope"
+TF_VAR_resource_name_prefix="ezazml"
 ## Authentication, users and spn
-TF_VAR_super_user_object_id: ${{ secrets.TF_VAR_SUPER_USER_OBJECT_ID }}
-TF_VAR_auth_application_name_prefix: "ezazml-app"
-TF_VAR_user_principal_name_prefix: "user1"
-TF_VAR_user_display_name: "User 1"
-TF_VAR_user_password: ${{ secrets.TF_VAR_USER_PASSWORD }}
+TF_VAR_super_devops_spn_object_id=<super_devops_spn_object_id>
+TF_VAR_auth_application_name_prefix="ezazml-app"
+TF_VAR_user_principal_name_prefix="user1"
+TF_VAR_user_display_name="User 1"
+TF_VAR_user_password=<user_password>
 ## Storage
-TF_VAR_adls_container_name: "ezazml"
+TF_VAR_adls_container_name="ezazml"
 ## Compute
-TF_VAR_compute_instance_size_dev: "Standard_A1_v2"
-TF_VAR_compute_cluster_size_dev: "STANDARD_DS2_V2"
-TF_VAR_compute_cluster_size_prd: "Standard_A1_v2"
-TF_VAR_compute_instance_count_dev: "0"
-TF_VAR_compute_instance_count_prd: "0"
-TF_VAR_compute_cluster_count_dev: "1"
-TF_VAR_compute_cluster_count_prd: "1"
-TF_VAR_compute_cluster_priority_dev: "Dedicated"
-TF_VAR_compute_cluster_priority_prd: "LowPriority"
-TF_VAR_compute_cluster_scale_min_node_dev: "0"
-TF_VAR_compute_cluster_scale_min_node_prd: "0"
-TF_VAR_compute_cluster_scale_max_node_dev: "3"
-TF_VAR_compute_cluster_scale_max_node_prd: "3"
+TF_VAR_compute_instance_size_dev="Standard_A1_v2"
+TF_VAR_compute_cluster_size_dev="STANDARD_DS2_V2"
+TF_VAR_compute_cluster_size_prd="Standard_A1_v2"
+TF_VAR_compute_instance_count_dev="0"
+TF_VAR_compute_instance_count_prd="0"
+TF_VAR_compute_cluster_count_dev="1"
+TF_VAR_compute_cluster_count_prd="1"
+TF_VAR_compute_cluster_priority_dev="Dedicated"
+TF_VAR_compute_cluster_priority_prd="LowPriority"
+TF_VAR_compute_cluster_scale_min_node_dev="0"
+TF_VAR_compute_cluster_scale_min_node_prd="0"
+TF_VAR_compute_cluster_scale_max_node_dev="3"
+TF_VAR_compute_cluster_scale_max_node_prd="3"
 ```
 If you are using a `.env` file, ensure that the file is present in the environment folder and contains the required 
 environment variables and set their values accordingly. 
@@ -295,24 +318,27 @@ environment variables and set their values accordingly.
 To authenticate to Azure, you have two options:
 
 - **Using Personal Account:**
+
+This option is recommended development and testing purposes.
 Run the following command to log in with your personal account, which is recommended for the first deployment:
 ```bash
 make login
 ```
 
 - **Using Service Principal:**
+This option is recommended for CICD pipelines and production deployments.
 If you are logging in using a service principal, make sure to set the following environment variables:
 ```dotenv
 ARM_CLIENT_ID=<your_azure_client_id>
 ARM_CLIENT_SECRET=<your_azure_client_secret>
+ARM_TENANT_ID=<tenant_ID>
+ARM_SUBSCRIPTION_ID=<subscription_ID>
 ```
-If you retrieved the service principal credentials from a previous deployment, you can set them as environment variables 
-with a Contributor role by default on the Resource group containing all resources including Azure ML workspace.
-
-After setting the environment variables, authenticate to Azure using the service principal:
-```bash
-make login-spn
-```
+If you run the first deployment with a service principal, you should provide a Super DevOPS Application with 
+the `Contributor` and `Role Based Access Control Administrator` roles on the Subscription. Please refer to the 
+Super DevOPS Application SPN section. 
+If you retrieved the Project DevOPS SPN credentials from a previous deployment, you can set them as environment variables 
+with a `Contributor` role by default on the Resource group containing all resources including Azure ML workspace.
 
 #### Step 4: Initialize Terraform
 
@@ -345,10 +371,14 @@ To apply the changes and create or update resources, run the following command:
 make tf-apply
 ```
 
-**SPN Credentials**
-You can now retrieve the value of the authentication application name and the workspace name from the Terraform output.
+**Project Application SPN Credentials**
+You can now retrieve the value of the Project DevOPS Application SPN name and the workspace name from the Terraform 
+output, and the client ID and Secret from the Azure Portal.
 You can use them to authenticate to Azure ML and interact with the workspace using the `ezazml` CLI, 
-with a Contributor role by default on the Resource group containing all resources including Azure ML workspace.
+with a `Contributor` role by default on the Resource group containing all resources including Azure ML workspace. This is 
+a more secure option than keeping using the Super DevOPS SPN having the `Contributor` and `Role Based Access Control Administrator` 
+roles on the Subscription.
+
 ```dotenv
 ARM_CLIENT_ID=<your_azure_client_id>
 ARM_CLIENT_SECRET=<your_azure_client_secret>

@@ -1,5 +1,5 @@
 # Auth variables
-variable "super_user_object_id" {
+variable "super_devops_spn_object_id" {
   type        = string
   description = "Super User Object ID"
 }
