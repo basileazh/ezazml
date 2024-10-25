@@ -289,6 +289,7 @@ TF_VAR_location="westeurope"
 TF_VAR_resource_name_prefix="ezazml"
 ## Authentication, users and spn
 TF_VAR_super_devops_spn_object_id=<super_devops_spn_object_id>
+TF_VAR_tf_backend_storage_account_id=<tf_backend_storage_account_id>
 TF_VAR_auth_application_name_prefix="ezazml-app"
 TF_VAR_user_principal_name_prefix="user1"
 TF_VAR_user_display_name="User 1"
