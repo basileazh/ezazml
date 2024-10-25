@@ -4,6 +4,11 @@ variable "super_user_object_id" {
   description = "Super User Object ID"
 }
 
+variable "tf_backend_storage_account_id" {
+  type        = string
+  description = "Storage Account ID"
+}
+
 variable "auth_application_name_prefix" {
   type        = string
   description = "Application Name"

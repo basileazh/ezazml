@@ -1,4 +1,4 @@
-# Azure AD Authentication Application
+# Entra ID Authentication Application
 
 data "azuread_client_config" "current" {}
 # Retrieve domain information
@@ -15,7 +15,7 @@ resource "azuread_application_password" "app_secret" {
   application_id = azuread_application_registration.app.id
 }
 
-resource "azuread_application_owner" "example_jane" {
+resource "azuread_application_owner" "example" {
   application_id  = azuread_application_registration.app.id
   owner_object_id = var.super_user_object_id
 }
@@ -26,10 +26,18 @@ resource "azuread_service_principal" "spn" {
   owners                       = [data.azuread_client_config.current.object_id]
 }
 
+# Grant the Service Principal Contributor access to the Resource Group and to the Storage Account where the Terraform backend is stored
+
 resource "azurerm_role_assignment" "rg_contributor_spn" {
   principal_id         = azuread_service_principal.spn.object_id
   role_definition_name = "Contributor"
   scope                = azurerm_resource_group.rg.id
+}
+
+resource "azurerm_role_assignment" "spn_storage_contributor" {
+  principal_id         = azuread_service_principal.spn.object_id
+  role_definition_name = "Storage Account Contributor"
+  scope                = var.tf_backend_storage_account_id
 }
 
 # Create a user
