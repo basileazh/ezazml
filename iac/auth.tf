@@ -38,7 +38,8 @@ resource "azuread_application_api_access" "example" {
 
   role_ids = [
     data.azuread_service_principal.msgraph.app_role_ids["Domain.Read.All"],
-    data.azuread_service_principal.msgraph.app_role_ids["Application.ReadWrite.OwnedBy"],
+    data.azuread_service_principal.msgraph.app_role_ids["User.ReadWrite.All"],
+    data.azuread_service_principal.msgraph.app_role_ids["Application.ReadWrite.All"],
   ]
 }
 
