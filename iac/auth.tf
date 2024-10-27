@@ -1,5 +1,11 @@
 # Entra ID Authentication Application
 
+data "azuread_application_published_app_ids" "well_known" {}
+
+data "azuread_service_principal" "msgraph" {
+  client_id = data.azuread_application_published_app_ids.well_known.result["MicrosoftGraph"]
+}
+
 data "azuread_client_config" "current" {}
 # Retrieve domain information
 
@@ -24,6 +30,16 @@ resource "azuread_service_principal" "spn" {
   client_id                    = azuread_application_registration.app.client_id
   app_role_assignment_required = false
   owners                       = [data.azuread_client_config.current.object_id]
+}
+
+resource "azuread_application_api_access" "example" {
+  application_id = azuread_application_registration.app.id
+  api_client_id  = data.azuread_application_published_app_ids.well_known.result["MicrosoftGraph"]
+
+  role_ids = [
+    data.azuread_service_principal.msgraph.app_role_ids["Domain.Read.All"],
+    data.azuread_service_principal.msgraph.app_role_ids["Application.ReadWrite.OwnedBy"],
+  ]
 }
 
 # Grant the Service Principal Contributor access to the Resource Group and to the Storage Account where the Terraform backend is stored

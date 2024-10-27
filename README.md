@@ -122,7 +122,7 @@ ARM_SUBSCRIPTION_ID=<subscription_ID># Subscription ID for auth to Azure. Availa
 TF_OUTPUT_NAME=tf.tfplan
 TF_WORKSPACE=<dev># Other workspaces can be created by duplicating the structure in the env/ folder.
 ## Resource group
-TF_VAR_tenant_id==<tenant_ID># Same as ARM_TENANT_ID
+TF_VAR_tenant_id=<tenant_ID># Same as ARM_TENANT_ID
 TF_VAR_location=westeurope# The location of the to-be Azure resource. https://azure.microsoft.com/en-gb/explore/global-infrastructure/geographies/
 TF_VAR_resource_name_prefix=<resource_name_prefix># The prefix for the to-be resource names. Ex: "ezazml"
 ## Authentication, users and spn
