@@ -8,9 +8,9 @@
 
 [//]: # (###### Contact: hitchhikesaver@gmail.com)
 
-#   EZAZ ML : Easy Azure ML
+# EZAZ ML: Streamlined MLOps on Azure
 
-[//]: # ([![Build Status]&#40;https://dev.azure.com/ezazml/ezazml/_apis/build/status/ezazml.ezazml?branchName=main&#41;]&#40;https://dev.azure.com/ezazml/ezazml/_build/latest?definitionId=1&branchName=main&#41;)
+[//]: # ([![Build Status]&#40;https://dev.azure.com/ezazml/ezazml/_apis/build/status/ezazml.ezazml?branchName=main&#41;]&#40;https://dev.azure.com/ezazml/ezazml/_build/latest?definitionId=1&branchName=main&#41;) 
 [//]: # ([![codecov]&#40;https://codecov.io/gh/ezazml/ezazml/branch/main/graph/badge.svg?token=JZQZQZQZQZ&#41;]&#40;https://codecov.io/gh/ezazml/ezazml&#41;)
 [//]: # ([![PyPI version]&#40;https://badge.fury.io/py/ezazml.svg&#41;]&#40;https://badge.fury.io/py/ezazml&#41;)
 
@@ -27,7 +27,7 @@
 [![Terrform](https://img.shields.io/badge/Terraform-SDK-blue)](https://pypi.org/project/terraform/)
 [![Python](https://img.shields.io/badge/Python-3.10-blue)](https://www.python.org/downloads/)
 
-[//]: # ([![GitHub]&#40;https://img.shields.io/github/workflow/status/ezazml/ezazml/CI?label=CI&#41;]&#40;
+[//]: # ([![GitHub]&#40;https://img.shields.io/github/workflow/status/ezazml/ezazml/CI?label=CI&#41;]&#40;)
 
 [//]: # ([![GitHub]&#40;https://img.shields.io/github/license/ezazml/ezazml&#41;]&#40;https://github.com/basileazh/ezazml/blob/main/LICENSE&#41;)
 
@@ -40,17 +40,43 @@
 [//]: # ([![GitHub]&#40;https://img.shields.io/github/contributors/ezazml/ezazml&#41;]&#40;https://github.com/basileazh/ezazml/graphs/contributors&#41;)
 
 
+EZAZ ML is an end-to-end solution that dramatically simplifies the deployment and management of Machine Learning operations on Azure. By combining Infrastructure as Code (Terraform), a powerful CLI, and environment-based configuration, it eliminates the complexity typically associated with Azure ML implementations.
 
-## Introduction
+## Agenda
+1. [Why EZAZ ML?](#why-ezaz-ml)
+2. [Current Capabilities](#current-capabilities)
+3. [License](#license)
+4. [Installation](#installation)
+   - [Prerequisites](#prerequisites)
+   - [Installation Steps](#installation)
+   - [Configuration](#configuration)
+5. [Infrastructure as Code](#infrastructure-as-code)
+6. [Azure ML Workspace Management](#azure-ml-workspace-management)
+7. [Deployment](#deployment)
+8. [Development](#development)
+9. [TODO](#todo)
 
-This repository is a solution with an IaC definition in Terraform, a CLI and configuration with environment variables to make it easy to use Azure ML. 
-It is a simple way to ship production-ready Azure ML pipelines and models 
-without having to worry about the complexity of the Azure ML SDK.
+## Why EZAZ ML?
 
-Using this package, you will be able to deploy a full MLOPS system before the end of your day, 
-just by configuring environment variables. For the moment, the following use case is supported : 
+- **Deploy in Minutes, Not Weeks**: Set up a complete MLOps environment on Azure ML in a single day through simple environment variable configuration
+- **Production-Ready**: Includes best practices for security, scalability, and maintainability out of the box
+- **Simplified Management**: Easy-to-use CLI for managing data assets, models, and deployments without deep Azure ML SDK knowledge
+- **Easy to Customize**: Easily extendable to support additional features and integrations
+- **Secure**: Built with security in mind, with best practices for RBAC, authentication and authorization
 
-![20240919_ezazml_documentation_simple_MLOPS_overview.jpg](docs%2Fv0%2F20240919_ezazml_documentation_simple_MLOPS_overview.jpg)
+And Open Source obviously 🙂
+
+## Current Capabilities
+
+The package currently supports the following MLOps workflow:
+
+<!-- ![20240919_ezazml_documentation_simple_MLOPS_overview.jpg](docs%2Fv0%2F20240919_ezazml_documentation_simple_MLOPS_overview.jpg) -->
+
+Perfect for teams looking to:
+- Quickly set up ML infrastructure on Azure, have a first model running in minutes
+- Implement MLOps best practices without extensive cloud expertise
+- Automate model training and deployment workflows
+- Maintain consistent environments across development and production
 
 
 ## License
@@ -87,7 +113,7 @@ And run the following command to retrieve the template project folder:
 
 ```bash
 ezazml init 
-````
+```
 
 The template project will de cloned from the `EZAZML_REPOSITORY_URL` in the `PROJECT_FOLDER_NAME` directory. You can then
 navigate to the `env/dev/` folder and start configuring the rest of the environment variables.
@@ -113,8 +139,14 @@ EZAZML_REPOSITORY_URL="https://github.com/basileazh/ezazml.git"
 PROJECT_FOLDER_NAME=<project_folder_name>
 
 # Auth settings
-ARM_CLIENT_ID=<spn_client_ID># Service Principal client ID for auth to Azure. Available in the Azure portal and after the first Terraform apply iac deployment.
-ARM_CLIENT_SECRET=<spn_client_secret># Service Principal secret for auth to Azure. Available in the Azure portal and after the first Terraform apply iac deployment.
+# For the Project SPN
+#ARM_CLIENT_ID=<project_spn_client_ID># Project SPN client ID. Available in the Azure portal.
+# For the DevOPS SPN
+ARM_CLIENT_ID=<devops_spn_client_ID># DevOPS SPN client ID. Available in the Azure portal.
+# For the Project SPN
+#ARM_CLIENT_SECRET=<project_spn_client_secret># Project SPN client secret. Available in the Azure portal.
+# For the DevOPS SPN
+ARM_CLIENT_SECRET=<devops_spn_client_secret># DevOPS SPN client secret. Available in the Azure portal.
 ARM_TENANT_ID=<tenant_ID># Tenant ID for auth to Azure. Available in the Azure portal.
 ARM_SUBSCRIPTION_ID=<subscription_ID># Subscription ID for auth to Azure. Available in the Azure portal.
 
@@ -126,7 +158,7 @@ TF_VAR_tenant_id=<tenant_ID># Same as ARM_TENANT_ID
 TF_VAR_location=westeurope# The location of the to-be Azure resource. https://azure.microsoft.com/en-gb/explore/global-infrastructure/geographies/
 TF_VAR_resource_name_prefix=<resource_name_prefix># The prefix for the to-be resource names. Ex: "ezazml"
 ## Authentication, users and spn
-TF_VAR_super_devops_spn_object_id==<super_devops_spn_object_id># The object ID of the super user. Can be found in the Azure portal.
+TF_VAR_devops_spn_object_id==<devops_spn_object_id># The object ID (not client ID) of the DevOPS SPN. Can be found in the Azure portal.
 TF_VAR_auth_application_name_prefix=<auth_application_name># The full application name will be the concatenation of the auth_application_name and the workspace name
 TF_VAR_user_principal_name_prefix=<user_principal_name_prefix># The full user principal name will be the concatenation of the user_principal_name, '@' and the domain of the tenant
 TF_VAR_user_display_name=<user_display_name>
@@ -193,6 +225,27 @@ LOG_DATETIME_FORMAT=%Y-%m-%d_%H
 
 If you use dotenv, add `dotenv` before every following `make` command in the `env/dev/` or `env/prd/` to load the environment variables.
 
+### Auth settings & SPNs
+
+The following block:
+```dotenv
+# Auth settings
+# For the Project SPN
+#ARM_CLIENT_ID=<project_spn_client_ID># Project SPN client ID. Available in the Azure portal.
+# For the DevOPS SPN
+ARM_CLIENT_ID=<devops_spn_client_ID># DevOPS SPN client ID. Available in the Azure portal.
+# For the Project SPN
+#ARM_CLIENT_SECRET=<project_spn_client_secret># Project SPN client secret. Available in the Azure portal.
+# For the DevOPS SPN
+ARM_CLIENT_SECRET=<devops_spn_client_secret># DevOPS SPN client secret. Available in the Azure portal.
+```
+
+enables you to use either the Project SPN or the DevOPS SPN. Here is when to use them:
+
+- **DevOPS SPN**: Use it for Terraform deployments when making changes to the infrastructure. Tailored for DevOps with `Contributor` role on the Subscription.
+- **Project SPN**: Use it for Docker image builds and deployments in your MLOPS pipelines, as well as for logging in to Azure Machine Learning Studio, reaching out to the Storage Account, etc. Tailored for the project with `Contributor` role on the Resource Group containing all resources.
+
+
 
 ## Infrastructure as Code
 
@@ -214,18 +267,17 @@ https://learn.hashicorp.com/tutorials/terraform/install-cli
 https://docs.microsoft.com/en-us/azure/storage/blobs/data-lake-storage-introduction
 - Environment variables set in the `.env` file or exported in the terminal
 
-### Super DevOPS Application SPN
+### DevOPS Application SPN
 
-To deploy the infrastructure, you will need to create a Super DevOPS Application associated with a 
-Service Principal (SPN) in Azure. The Super DevOPS SPN will be used to authenticate to Azure and deploy the resources.
+To deploy the infrastructure, you will need to create a DevOPS Application associated with a Service Principal (SPN) in Azure. The DevOPS SPN will be used to authenticate to Azure and deploy the resources using Terraform.
 The application should have the `Contributor` and `Role Based Access Control Administrator` roles on the Subscription, 
 and be granted the following API permissions in Entra ID : 
 - `Application.ReadWrite.OwnedBy`
+- `Application.ReadWrite.All`
 - `Directory.Read.All`
 - `User.Read`
 - `User.ReadWrite.All`
 
-We will use this SPN for the first deployment, then we will use a Project DevOPS SPN that will be created during this first 
 deployment and that will have the `Contributor` role on the Resource group containing all resources including 
 Azure ML workspace. This allows us to restrict the permissions of the SPN to the 
 scope of the Azure ML workspace. This can be done by following instructions at this page : 
@@ -276,6 +328,8 @@ to your requirements. See the previous section for a detailed explanation of eac
 
 ```dotenv
 # Auth settings
+ARM_CLIENT_ID=<devops_spn_client_ID>
+ARM_CLIENT_SECRET=<devops_spn_client_secret>
 ARM_TENANT_ID=<tenant_ID>
 ARM_SUBSCRIPTION_ID=<subscription_ID>
 
@@ -288,7 +342,7 @@ TF_VAR_tenant_id=<tenant_ID>
 TF_VAR_location="westeurope"
 TF_VAR_resource_name_prefix="ezazml"
 ## Authentication, users and spn
-TF_VAR_super_devops_spn_object_id=<super_devops_spn_object_id>
+TF_VAR_devops_spn_object_id=<devops_spn_object_id>
 TF_VAR_tf_backend_storage_account_id=<tf_backend_storage_account_id>
 TF_VAR_auth_application_name_prefix="ezazml-app"
 TF_VAR_user_principal_name_prefix="user1"
@@ -318,28 +372,24 @@ environment variables and set their values accordingly.
 
 To authenticate to Azure, you have two options:
 
+- **Using Service Principal:**
+This option is recommended for CICD pipelines and production deployments. You should provide a DevOPS Application with the `Contributor` and `Role Based Access Control Administrator` roles on the Subscription. Please refer to the [DevOPS Application SPN section](#devops-application-spn-section) for more details.  
+If you are logging in using a service principal, make sure to set the following environment variables:
+```dotenv
+ARM_CLIENT_ID=<devops_spn_client_ID>
+ARM_CLIENT_SECRET=<devops_spn_client_secret>
+ARM_TENANT_ID=<tenant_ID>
+ARM_SUBSCRIPTION_ID=<subscription_ID>
+```
+
 - **Using Personal Account:**
 
-This option is recommended development and testing purposes.
+This option is available for development and testing purposes if your personal account benefits from at least the permissions needed for the [DevOPS Application SPN section](#devops-application-spn-section)
 Run the following command to log in with your personal account, which is recommended for the first deployment:
 ```bash
 make login
 ```
 
-- **Using Service Principal:**
-This option is recommended for CICD pipelines and production deployments.
-If you are logging in using a service principal, make sure to set the following environment variables:
-```dotenv
-ARM_CLIENT_ID=<your_azure_client_id>
-ARM_CLIENT_SECRET=<your_azure_client_secret>
-ARM_TENANT_ID=<tenant_ID>
-ARM_SUBSCRIPTION_ID=<subscription_ID>
-```
-If you run the first deployment with a service principal, you should provide a Super DevOPS Application with 
-the `Contributor` and `Role Based Access Control Administrator` roles on the Subscription. Please refer to the 
-Super DevOPS Application SPN section. 
-If you retrieved the Project DevOPS SPN credentials from a previous deployment, you can set them as environment variables 
-with a `Contributor` role by default on the Resource group containing all resources including Azure ML workspace.
 
 #### Step 4: Initialize Terraform
 
@@ -356,36 +406,142 @@ beforehand in a dedicated resource group.
 - The recommended naming conventions for this Terraform setup can be found in the `infra/providers.tf` file.
 
 #### Step 5: Import Existing Resource Group (Optional)
-
-If you are deploying Azure ML into an existing resource group, you can import the resource group using the following command:
+- If you have to create all resources, you can skip this step
+- If you have to create all resources, in an Azure Subscription where you have deployed a project with different resources names you can skip this step
+- If you are deploying Azure ML into an existing resource group, you can import the resource group using the following command:
 ```bash
 make tf-import-rg
 ```
+- If you recreate resources in the same Azure Subscription as a previous deployment that has been destroyed, and you want to keep the same resources names, you will have to manually purge from the Azure Portal:
+  - Azure Key Vault
+  - Azure ML Workspace
+Open their respective resouce page, click on `Manage Deleted "resouce"` and Purge.
+
+The Azure Data Lake Storage (ADLS) account cannot be destoryed, and then has to be restored and imported, otherwised to have its name changed. To import it : 
+
+```bash
+make tf-import-adls
+``` 
 #### Step 6: Review Changes
 Before applying changes, run the `make tf-plan` command to review the changes that will be made:
 ```bash
 make tf-plan
 ```
+
 #### Step 7: Apply Changes
 To apply the changes and create or update resources, run the following command:
 ```bash
 make tf-apply
 ```
 
-**Project Application SPN Credentials**
-You can now retrieve the value of the Project DevOPS Application SPN name and the workspace name from the Terraform 
-output, and the client ID and Secret from the Azure Portal.
-You can use them to authenticate to Azure ML and interact with the workspace using the `ezazml` CLI, 
-with a `Contributor` role by default on the Resource group containing all resources including Azure ML workspace. This is 
-a more secure option than keeping using the Super DevOPS SPN having the `Contributor` and `Role Based Access Control Administrator` 
-roles on the Subscription.
-
-```dotenv
-ARM_CLIENT_ID=<your_azure_client_id>
-ARM_CLIENT_SECRET=<your_azure_client_secret>
-```
+**Project SPN**
+You can now retrieve the value of the Project  SPN Client ID and Secret from Entra ID / App Registrations in the Azure Portal.
+The Project SPN has a `Contributor` role on the Resource Group, and `Set`, `Get`, `List` permissions on the Key Vault secrets. It should be used across resources to fuel Azure ML pipelines, as environment variables.
 
 Azure portal: https://portal.azure.com/
+
+### Destroy the infrastructure
+
+To destroy the infrastructure, run any of the following command:
+
+```bash
+make tf-destroy
+make tf-destroy-aa
+```
+- `-aa` will destroy the infrastructure without asking for confirmation
+
+You will have to manually purge from the Azure Portal:
+  - Azure Key Vault
+  - Azure ML Workspace
+Open their respective resouce page, click on `Manage Deleted "resouce"` and Purge.
+The ADLS account cannot be destoryed, and will be purged after a few days.
+
+### Reinitialize the infrastructure
+
+First, destroy the infrastructure as explained in [Destroy the infrastructure](#destroy-the-infrastructure).
+
+#### Resouces naming changes
+
+##### Recommended: new project name
+
+If you wish to redeploy the infrastructure, it is recommended to change the name of the resources project name. The following environment variables are available to change the project name:
+```dotenv
+TF_VAR_resource_name_prefix=
+
+TF_VAR_auth_application_name_prefix=
+
+AML_WORKSPACE_NAME=
+AML_RESOURCE_GROUP=
+
+ABDS_NAME=
+
+ABDS_ACCOUNT_NAME=
+ABDS_CONTAINER_NAME=
+```
+
+##### Alternative: same project name
+
+If you want to redeploy the infrastructure with the same project name, you can skip the naming changes.
+
+You need to manage the following resources manually
+
+**Azure Key Vault**
+You can either restore the existing Key Vault from the Azure Portal, or purge it from the soft-deleted resource page and create a new one. If you restore it, you will have to import it using the following command:
+
+```bash
+# Key Vault
+terraform import azurerm_key_vault.example /subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.KeyVault/vaults/{vault_name}
+```
+
+**Azure ML Workspace**
+You can either restore the existing Azure ML Workspace from the Azure Portal, or purge it from the soft-deleted resource page and create a new one. If you restore it, you will have to import it using the following command:
+
+```bash
+# Azure ML Workspace
+terraform import azurerm_machine_learning_workspace.example /subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.MachineLearningServices/workspaces/{workspace_name}
+```
+
+**Azure Data Lake Storage (ADLS) account**
+The ADLS account cannot be destoryed, and will be purged after a few days. You can restore it from the Azure Portal. If you restore it, you will have to import it using the following command:
+
+```bash
+# Storage Account
+terraform import azurerm_storage_account.example /subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.Storage/storageAccounts/{storage_account_name}
+```
+
+#### User name and password
+For any deployment, it is recommended to change the user name and password. The following environment variables are available to change the user name and password:
+```dotenv
+TF_VAR_user_principal_name_prefix=
+TF_VAR_user_display_name=
+TF_VAR_user_password=
+```
+
+#### Redeploy the infrastructure
+To reinitialize the infrastructure, run any of the following command:
+
+- For one-command auto-approve full redeployment:
+```bash
+make tf-apply-aa
+```
+
+- For a 2-step plan and apply:
+```bash
+make tf-plan
+make tf-apply
+```
+
+#### Update environment variables
+Then you can update the environment variables from Azure Portal:
+```dotenv
+# For the Project SPN
+ARM_CLIENT_ID=
+
+# For the Project SPN
+ARM_CLIENT_SECRET=
+
+ADLS_ACCOUNT_KEY=
+```
 
 ### Conclusion on infrastructure deployment
 This documentation provides the necessary steps to deploy Azure ML and associated services using Terraform. Ensure you have set all required environment variables, authenticate to Azure correctly, and follow the outlined steps for a successful deployment.
@@ -590,9 +746,12 @@ make clean-tests-files
 
 ## TODO
 
-### Priority level 1 - HOT
+### Priority level 0 - WIP
 Bug fixes, critical improvements, current sprint tasks.
+- Testing full deployments and destruction of the infrastructure for both dev and prd environments
 
+### Priority level 1 - HOT
+Top priority new features, next sprint tasks.
 -  Training
   - Add a command to train a model in the Azure ML workspace.
   - Add a command to register the model in the Azure ML workspace.
@@ -600,8 +759,9 @@ Bug fixes, critical improvements, current sprint tasks.
   - Add a command to deploy the model in a batch inference pipeline in the Azure ML workspace.
 
 ### Priority level 2 - WARM
-Medium issues, improvements, next sprint tasks.
-
+December 2024 tasks.
+- Fix iac/script/purge_resouces.sh to purge the resources without having to go to the Azure Portal.
+- Fix key_vault.tf to include the secrets from the Key Vault.
 - Inference
   - Add a command to run a batch inference pipeline in the Azure ML workspace.
   - Add a command to run a batch inference pipeline in the Azure ML workspace with a model registered in the workspace.
@@ -611,7 +771,7 @@ Medium issues, improvements, next sprint tasks.
   - Add a command to retrieve the monitoring logs of the Azure ML workspace.
   - 
 ### Priority level 3 - COLD
-Minor issues that can be fixed later, minor improvements, refactoring.
+January 2025 tasks.
 
 - Documentation
   - Add a section in the README.md file to explain how to deploy the package in a CICD pipeline.

@@ -27,14 +27,17 @@ tf-upgrade:
 tf-import-rg:
 	${MAKE} -C ../../iac/ tf-import-rg
 
-tf-plan-no-input:
-	${MAKE} -C ../../iac/ tf-plan-no-input
+tf-import-adls:
+	${MAKE} -C ../../iac/ tf-import-adls
+
+tf-plan-no-output-aa:
+	${MAKE} -C ../../iac/ tf-plan-no-output-aa
 
 tf-fmt-check:
 	${MAKE} -C ../../iac/ tf-fmt-check
 
-tf-plan-output:
-	${MAKE} -C ../../iac/ tf-plan-output
+tf-plan:
+	${MAKE} -C ../../iac/ tf-plan
 
 tf-apply:
 	${MAKE} -C ../../iac/ tf-apply

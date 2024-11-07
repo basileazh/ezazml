@@ -1,7 +1,7 @@
 # Auth variables
-variable "super_devops_spn_object_id" {
+variable "devops_spn_object_id" {
   type        = string
-  description = "Super User Object ID"
+  description = "DevOPS SPN Object ID"
 }
 
 variable "tf_backend_storage_account_id" {
