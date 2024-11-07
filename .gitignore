@@ -29,6 +29,9 @@ dist/
 # Cursor IDE
 .cursorrules
 
+# Dev
+.todo
+
 # Unit test reports
 TEST*.xml
 
