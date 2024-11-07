@@ -26,6 +26,9 @@ dist/
 # JetBrains IDE
 .idea/
 
+# Cursor IDE
+.cursorrules
+
 # Unit test reports
 TEST*.xml
 
