@@ -502,6 +502,28 @@ Azure portal: https://portal.azure.com/
       - Related ticket ID
    4. Click "Run workflow"
 
+##### Secrets
+
+To ensure the proper functioning of the destruction workflow, you need to set the following secrets in your GitHub repository:
+ ```text
+   # Azure Authentication
+   AZURE_CLIENT_ID          # DevOps SPN Client ID
+   AZURE_SUBSCRIPTION_ID    # Azure Subscription ID
+   AZURE_TENANT_ID         # Azure Tenant ID
+   ARM_SUBSCRIPTION_ID     # Azure Subscription ID
+   
+   # Terraform Variables
+   TF_VAR_DEVOPS_SPN_OBJECT_ID           # Object ID of the DevOps SPN
+   TF_VAR_TF_BACKEND_STORAGE_ACCOUNT_ID   # Storage Account ID for Terraform backend
+   TF_VAR_USER_PASSWORD                   # Password for the Azure AD user
+
+   SMTP_SERVER           # SMTP server address
+   SMTP_PORT           # SMTP server port
+   SMTP_USERNAME           # SMTP server username
+   SMTP_PASSWORD           # SMTP server password
+   EMAIL_NOTIFICATIONS           # Email addresses to notify for destruction
+   ```
+
 ##### Safety Checks
    The workflow will automatically:
    - Verify confirmation string

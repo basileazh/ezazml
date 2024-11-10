@@ -66,25 +66,30 @@ jobs:
       - name: Verify User Authorization
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}  # Explicitly specify token
           script: |
-            const authorized_users = [
-              'authorized-user1',
-              'authorized-user2',
-              'admin-user'
-            ];
-            const authorized_teams = [
-              'infrastructure-admins',
-              'platform-leads'
-            ];
-            
-            if (!authorized_users.includes(context.actor)) {
-              const teams = await github.rest.teams.listForAuthenticatedUser();
-              const userTeams = teams.data.map(team => team.name);
-              const hasAuthorizedTeam = authorized_teams.some(team => userTeams.includes(team));
+            try {
+              const authorized_users = [
+                'authorized-user1',
+                'authorized-user2',
+                'admin-user'
+              ];
+              const authorized_teams = [
+                'infrastructure-admins',
+                'platform-leads'
+              ];
               
-              if (!hasAuthorizedTeam) {
-                core.setFailed(`User ${context.actor} is not authorized to destroy infrastructure`);
+              if (!authorized_users.includes(context.actor)) {
+                const teams = await github.rest.teams.listForAuthenticatedUser();
+                const userTeams = teams.data.map(team => team.name);
+                const hasAuthorizedTeam = authorized_teams.some(team => userTeams.includes(team));
+                
+                if (!hasAuthorizedTeam) {
+                  core.setFailed(`User ${context.actor} is not authorized to destroy infrastructure`);
+                }
               }
+            } catch (error) {
+              core.setFailed(`Authorization check failed: ${error.message}`);
             }
 
       - name: Verify Business Hours
