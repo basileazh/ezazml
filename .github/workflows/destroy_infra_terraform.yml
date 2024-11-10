@@ -1,0 +1,259 @@
+# ⚠️ DANGER: This workflow destroys infrastructure permanently ⚠️
+name: 🚨 Destroy Infrastructure with Terraform 🚨
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: '⚠️ Select environment to DESTROY ⚠️'
+        required: true
+        type: choice
+        options:
+          - dev
+          - staging
+          - prod
+      confirmation:
+        description: '⚠️ Type "DESTROY-INFRASTRUCTURE-[ENV]-[DATE]" (e.g., DESTROY-INFRASTRUCTURE-DEV-2024-02-20)'
+        required: true
+        type: string
+      reason:
+        description: 'Detailed reason for infrastructure destruction'
+        required: true
+        type: string
+      ticket_id:
+        description: 'Related JIRA/ticket reference'
+        required: true
+        type: string
+
+# Prevent multiple destruction workflows from running simultaneously
+concurrency:
+  group: destroy-${{ github.event.inputs.environment }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  id-token: write
+  checks: write    # For creating check runs
+
+jobs:
+  pre-destroy-checks:
+    name: 🔒 Verification and Safety Checks
+    runs-on: ubuntu-latest
+    environment: 
+      name: ${{ github.event.inputs.environment }}
+      url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    
+    outputs:
+      expected_confirmation: ${{ steps.set-confirmation.outputs.expected_string }}
+    
+    steps:
+      - name: Generate Expected Confirmation String
+        id: set-confirmation
+        run: |
+          CURRENT_DATE=$(date +%Y-%m-%d)
+          EXPECTED="DESTROY-INFRASTRUCTURE-${{ github.event.inputs.environment }}-${CURRENT_DATE}"
+          echo "expected_string=${EXPECTED}" >> $GITHUB_OUTPUT
+          echo "Expected confirmation string: ${EXPECTED}"
+
+      - name: Verify Confirmation String
+        if: github.event.inputs.confirmation != steps.set-confirmation.outputs.expected_string
+        run: |
+          echo "❌ ERROR: Confirmation string does not match expected format"
+          echo "Expected: ${{ steps.set-confirmation.outputs.expected_string }}"
+          echo "Received: ${{ github.event.inputs.confirmation }}"
+          exit 1
+
+      - name: Verify User Authorization
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const authorized_users = [
+              'authorized-user1',
+              'authorized-user2',
+              'admin-user'
+            ];
+            const authorized_teams = [
+              'infrastructure-admins',
+              'platform-leads'
+            ];
+            
+            if (!authorized_users.includes(context.actor)) {
+              const teams = await github.rest.teams.listForAuthenticatedUser();
+              const userTeams = teams.data.map(team => team.name);
+              const hasAuthorizedTeam = authorized_teams.some(team => userTeams.includes(team));
+              
+              if (!hasAuthorizedTeam) {
+                core.setFailed(`User ${context.actor} is not authorized to destroy infrastructure`);
+              }
+            }
+
+      - name: Verify Business Hours
+        run: |
+          HOUR=$(date +%H)
+          DAY=$(date +%u)
+          if [ $DAY -gt 5 ] || [ $HOUR -lt 9 ] || [ $HOUR -gt 17 ]; then
+            echo "❌ ERROR: Infrastructure destruction is only allowed during business hours (Mon-Fri, 9 AM - 5 PM)"
+            exit 1
+          fi
+
+  notify-stakeholders:
+    name: 📢 Notify Stakeholders
+    needs: pre-destroy-checks
+    runs-on: ubuntu-latest
+    steps:
+      # - name: Send Slack Notification
+      #   uses: slackapi/slack-github-action@v1.24.0
+      #   with:
+      #     channel-id: 'infrastructure-alerts'
+      #     slack-message: |
+      #       🚨 *INFRASTRUCTURE DESTRUCTION INITIATED*
+      #       *Environment:* ${{ github.event.inputs.environment }}
+      #       *Requested by:* ${{ github.actor }}
+      #       *Ticket:* ${{ github.event.inputs.ticket_id }}
+      #       *Reason:* ${{ github.event.inputs.reason }}
+            
+      #       Destruction will begin in 10 minutes. React with 🔴 to abort.
+      #   env:
+      #     SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
+      - name: Send Email Notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "🚨 Infrastructure Destruction Initiated - ${{ github.event.inputs.environment }}"
+          body: |
+            Infrastructure destruction has been initiated.
+            
+            Environment: ${{ github.event.inputs.environment }}
+            Requested by: ${{ github.actor }}
+            Ticket: ${{ github.event.inputs.ticket_id }}
+            Reason: ${{ github.event.inputs.reason }}
+            
+            This action will begin in 10 minutes.
+          from: github-actions@company.com
+          to: ${{ secrets.EMAIL_NOTIFICATIONS }}
+
+      - name: Mandatory Wait Period
+        run: |
+          echo "Waiting 10 minutes before proceeding with destruction..."
+          sleep 600
+
+  destroy-terraform:
+    name: 💥 Execute Infrastructure Destruction
+    needs: [pre-destroy-checks, notify-stakeholders]
+    runs-on: ubuntu-latest
+    environment: 
+      name: ${{ github.event.inputs.environment }}
+      url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Create Audit Log Directory
+        run: mkdir -p audit-logs
+
+      - name: Record Pre-Destruction State
+        run: |
+          echo "Recording pre-destruction state at $(date)" > audit-logs/pre-destruction-state.txt
+          echo "Actor: ${{ github.actor }}" >> audit-logs/pre-destruction-state.txt
+          echo "Environment: ${{ github.event.inputs.environment }}" >> audit-logs/pre-destruction-state.txt
+          echo "Workflow Run ID: ${{ github.run_id }}" >> audit-logs/pre-destruction-state.txt
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5.7"
+
+      - name: Terraform Init and Workspace Selection
+        working-directory: ./iac
+        run: |
+          make tf-init-ws
+        env:
+          TF_WORKSPACE: ${{ github.event.inputs.environment }}
+          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          ARM_USE_OIDC: true
+
+      - name: Terraform Plan Destroy
+        id: plan
+        working-directory: ./iac
+        run: |
+          terraform plan -destroy -out=destroy.tfplan
+          terraform show -json destroy.tfplan > ../audit-logs/destroy-plan.json
+        env:
+          TF_WORKSPACE: ${{ github.event.inputs.environment }}
+          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          ARM_USE_OIDC: true
+
+      - name: Execute Terraform Destroy
+        working-directory: ./iac
+        run: |
+          make tf-destroy-aa
+        env:
+          TF_WORKSPACE: ${{ github.event.inputs.environment }}
+          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          ARM_USE_OIDC: true
+
+      - name: Record Post-Destruction State
+        run: |
+          echo "Recording post-destruction state at $(date)" > audit-logs/post-destruction-state.txt
+          echo "Destruction completed successfully" >> audit-logs/post-destruction-state.txt
+
+      - name: Upload Audit Logs
+        uses: actions/upload-artifact@v3
+        with:
+          name: destruction-audit-logs
+          path: audit-logs/
+          retention-days: 90
+
+  post-destroy-notifications:
+    name: 📝 Post-Destruction Tasks
+    needs: [destroy-terraform, pre-destroy-checks]
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+      # - name: Notify Slack of Completion
+      #   uses: slackapi/slack-github-action@v1.24.0
+      #   with:
+      #     channel-id: 'infrastructure-alerts'
+      #     slack-message: |
+      #       Infrastructure Destruction Status: ${{ needs.destroy-terraform.result == 'success' && '✅ Completed' || '❌ Failed' }}
+      #       Environment: ${{ github.event.inputs.environment }}
+      #       Executed by: ${{ github.actor }}
+      #       Workflow Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      #   env:
+      #     SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      
+      - name: Send Email Notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "🚨 Infrastructure Destruction Completed"
+          body: |
+            Infrastructure destruction has been completed successfully.
+            
+            Environment: ${{ github.event.inputs.environment }}
+            Executed by: ${{ github.actor }}
+            Workflow Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          from: github-actions@company.com
+          to: ${{ secrets.EMAIL_NOTIFICATIONS }}

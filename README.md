@@ -313,14 +313,62 @@ The Terraform configuration in this package deploys the following services:
   
 ### Instructions for Deployment
 
-#### Step 1: Navigate to the Environment Folder
+The recommended way to deploy the infrastructure is to use GitHub Actions.
+
+#### GitHub Actions Deployment
+
+##### GHA Step 1: Configure GitHub Secrets
+   Add the following secrets in your repository (Settings → Secrets and variables → Actions):
+   ```text
+   # Azure Authentication
+   AZURE_CLIENT_ID          # DevOps SPN Client ID
+   AZURE_SUBSCRIPTION_ID    # Azure Subscription ID
+   AZURE_TENANT_ID         # Azure Tenant ID
+   ARM_SUBSCRIPTION_ID     # Azure Subscription ID
+   
+   # Terraform Variables
+   TF_VAR_DEVOPS_SPN_OBJECT_ID           # Object ID of the DevOps SPN
+   TF_VAR_TF_BACKEND_STORAGE_ACCOUNT_ID   # Storage Account ID for Terraform backend
+   TF_VAR_USER_PASSWORD                   # Password for the Azure AD user
+   ```
+
+##### GHA Step 2: Configure Environment Variables
+   Review and modify environment variables in the workflow files as needed:
+   ```yaml
+   env:
+     TF_WORKSPACE: "dev"
+     TF_VAR_location: "westeurope"
+     TF_VAR_resource_name_prefix: "ezazml"
+     # ... other variables
+   ```
+
+##### GHA Step 3: Deploy Infrastructure
+   - Push changes to `main` branch (affecting `.tf` files), or
+   - Create a pull request, or
+   - Manually trigger:
+     1. Go to Actions → deploy_infra_terraform
+     2. Click "Run workflow"
+     3. Select branch
+     4. Click "Run workflow"
+
+##### GHA Step 4: Monitor Deployment
+   - View progress in GitHub Actions tab
+   - Check job outputs for each step
+   - Review Terraform plans in job artifacts
+
+
+#### CLI Deployment
+
+Alternatively, you can follow the following instructions to deploy the infrastructure manually or using a CI/CD pipeline via CLI.
+
+##### CLI Step 1: Navigate to the Environment Folder
 
 To begin the deployment, navigate to the environment folder corresponding to the environment you wish to deploy 
 (e.g., `env/dev/` for development). You can create other environments by duplicating the structure in the `env/` folder.
 All Terraform commands must be run from within the selected environment folder if you have stored your environment 
 variables in a `.env` file there.
 
-#### Step 2: Set Environment Variables
+##### CLI Step 2: Set Environment Variables
 
 Set the following environment variables in the `.env` file or export them in the terminal.
 `ARM_TENANT_ID`, `ARM_SUBSCRIPTION_ID` are available in the Azure portal. All other variables can be set according
@@ -368,7 +416,7 @@ TF_VAR_compute_cluster_scale_max_node_prd="3"
 If you are using a `.env` file, ensure that the file is present in the environment folder and contains the required 
 environment variables and set their values accordingly. 
 
-#### Step 3: Authenticate to Azure
+##### CLI Step 3: Authenticate to Azure
 
 To authenticate to Azure, you have two options:
 
@@ -391,7 +439,7 @@ make login
 ```
 
 
-#### Step 4: Initialize Terraform
+##### CLI Step 4: Initialize Terraform
 
 Run the following command to initialize Terraform. This will set up the backend and configure the state according 
 to the settings in the `providers.tf` file. Additionally, the `dev` workspace will be created if it does not already exist.
@@ -405,7 +453,7 @@ make tf-init
 beforehand in a dedicated resource group.
 - The recommended naming conventions for this Terraform setup can be found in the `infra/providers.tf` file.
 
-#### Step 5: Import Existing Resource Group (Optional)
+##### CLI Step 5: Import Existing Resource Group (Optional)
 - If you have to create all resources, you can skip this step
 - If you have to create all resources, in an Azure Subscription where you have deployed a project with different resources names you can skip this step
 - If you are deploying Azure ML into an existing resource group, you can import the resource group using the following command:
@@ -422,13 +470,13 @@ The Azure Data Lake Storage (ADLS) account cannot be destoryed, and then has to 
 ```bash
 make tf-import-adls
 ``` 
-#### Step 6: Review Changes
+##### CLI Step 6: Review Changes
 Before applying changes, run the `make tf-plan` command to review the changes that will be made:
 ```bash
 make tf-plan
 ```
 
-#### Step 7: Apply Changes
+##### CLI Step 7: Apply Changes
 To apply the changes and create or update resources, run the following command:
 ```bash
 make tf-apply
@@ -442,7 +490,41 @@ Azure portal: https://portal.azure.com/
 
 ### Destroy the infrastructure
 
-To destroy the infrastructure, run any of the following command:
+#### GitHub Actions Destruction
+
+##### Trigger Destruction Workflow
+   1. Go to Actions → destroy_infra_terraform
+   2. Click "Run workflow"
+   3. Fill in required information:
+      - Environment (dev/staging/prod)
+      - Confirmation string (format: `DESTROY-INFRASTRUCTURE-[ENV]-[DATE]`)
+      - Reason for destruction
+      - Related ticket ID
+   4. Click "Run workflow"
+
+##### Safety Checks
+   The workflow will automatically:
+   - Verify confirmation string
+   - Check business hours (Mon-Fri, 9 AM - 5 PM)
+   - Verify user authorization
+   - Send notification to stakeholders
+   - Wait 10 minutes before proceeding
+
+##### Monitor Destruction
+   - View progress in GitHub Actions tab
+   - Check destruction logs in artifacts
+   - Await completion email notification
+
+##### Manual Resource Cleanup
+   You will have to manually purge from the Azure Portal:
+   - Azure Key Vault
+   - Azure ML Workspace
+   Open their respective resource page, click on `Manage Deleted "resource"` and Purge.
+   The ADLS account cannot be destroyed, and will be purged after a few days.
+
+#### CLI Destruction
+
+To destroy the infrastructure via CLI, run any of the following command:
 
 ```bash
 make tf-destroy
@@ -460,7 +542,76 @@ The ADLS account cannot be destoryed, and will be purged after a few days.
 
 First, destroy the infrastructure as explained in [Destroy the infrastructure](#destroy-the-infrastructure).
 
-#### Resouces naming changes
+// ... existing code ...
+
+### Reinitialize the infrastructure
+
+First, destroy the infrastructure as explained in [Destroy the infrastructure](#destroy-the-infrastructure).
+
+#### GitHub Actions Reinitialization
+
+##### Step 1: Resource Naming Changes
+
+###### Recommended: New Project Name
+If you wish to redeploy the infrastructure, update the following GitHub repository secrets:
+```text
+TF_VAR_RESOURCE_NAME_PREFIX      # New project name prefix
+```
+
+And update the following environment variables in the workflow files:
+```yaml
+env:
+  TF_VAR_AUTH_APPLICATION_NAME_PREFIX: "new-app-name"
+  AML_WORKSPACE_NAME: "new-workspace-name"
+  AML_RESOURCE_GROUP: "new-resource-group"
+  ABDS_NAME: "new-datastore-name"
+  ABDS_ACCOUNT_NAME: "new-storage-account"
+  ABDS_CONTAINER_NAME: "new-container-name"
+```
+
+###### Alternative: Same Project Name
+If redeploying with the same project name:
+1. Manually manage the following resources in Azure Portal:
+   - Azure Key Vault: Either restore or purge and recreate
+   - Azure ML Workspace: Either restore or purge and recreate
+   - ADLS account: Will need to be restored (cannot be purged)
+
+2. If restoring resources, they must be imported into Terraform state using the workflow:
+   1. Go to Actions → import_resources_terraform
+   2. Click "Run workflow"
+   3. Select resources to import
+   4. Click "Run workflow"
+
+##### Step 2: Update User Credentials
+Update the following GitHub secret:
+```text
+TF_VAR_USER_PASSWORD    # New user password
+```
+
+And update the following environment variables in the workflow files:
+```yaml
+env:
+  TF_VAR_USER_PRINCIPAL_NAME_PREFIX: "new-user"
+  TF_VAR_USER_DISPLAY_NAME: "New User"
+```
+
+##### Step 3: Redeploy Infrastructure
+1. Go to Actions → deploy_infra_terraform
+2. Click "Run workflow"
+3. Select branch
+4. Click "Run workflow"
+
+##### Step 4: Update Environment Variables
+After successful deployment, update the following GitHub secrets with values from Azure Portal:
+```text
+AZURE_CLIENT_ID        # New Project SPN Client ID
+AZURE_CLIENT_SECRET    # New Project SPN Client Secret
+ADLS_ACCOUNT_KEY       # New Storage Account Key
+```
+
+#### CLI Reinitialization
+
+##### Step 1: Resouces naming changes
 
 ##### Recommended: new project name
 
@@ -517,7 +668,7 @@ TF_VAR_user_display_name=
 TF_VAR_user_password=
 ```
 
-#### Redeploy the infrastructure
+##### Step 2: Redeploy the infrastructure
 To reinitialize the infrastructure, run any of the following command:
 
 - For one-command auto-approve full redeployment:
@@ -531,7 +682,7 @@ make tf-plan
 make tf-apply
 ```
 
-#### Update environment variables
+##### Step 3: Update environment variables
 Then you can update the environment variables from Azure Portal:
 ```dotenv
 # For the Project SPN
@@ -544,7 +695,7 @@ ADLS_ACCOUNT_KEY=
 ```
 
 ### Conclusion on infrastructure deployment
-This documentation provides the necessary steps to deploy Azure ML and associated services using Terraform. Ensure you have set all required environment variables, authenticate to Azure correctly, and follow the outlined steps for a successful deployment.
+This documentation provides the necessary steps to deploy Azure ML and associated services using Terraform. Ensure you have set all required environment variables, authenticate to Azure correctly, and follow the outlined steps for a successful deployment from Github Actions or CLI.
 
 
 ## Azure ML Workspace Management
