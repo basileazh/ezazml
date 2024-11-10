@@ -101,58 +101,58 @@ jobs:
       #       exit 1
       #     fi
 
-  notify-stakeholders:
-    name: 📢 Notify Stakeholders
-    needs: pre-destroy-checks
-    runs-on: ubuntu-latest
-    environment:
-      name: ${{ github.event.inputs.environment }}
-      url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-    steps:
-      # - name: Send Slack Notification
-      #   uses: slackapi/slack-github-action@v1.24.0
-      #   with:
-      #     channel-id: 'infrastructure-alerts'
-      #     slack-message: |
-      #       🚨 *INFRASTRUCTURE DESTRUCTION INITIATED*
-      #       *Environment:* ${{ github.event.inputs.environment }}
-      #       *Requested by:* ${{ github.actor }}
-      #       *Ticket:* ${{ github.event.inputs.ticket_id }}
-      #       *Reason:* ${{ github.event.inputs.reason }}
+  # notify-stakeholders:
+  #   name: 📢 Notify Stakeholders
+  #   needs: pre-destroy-checks
+  #   runs-on: ubuntu-latest
+  #   environment:
+  #     name: ${{ github.event.inputs.environment }}
+  #     url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+  #   steps:
+  #     - name: Send Slack Notification
+  #       uses: slackapi/slack-github-action@v1.24.0
+  #       with:
+  #         channel-id: 'infrastructure-alerts'
+  #         slack-message: |
+  #           🚨 *INFRASTRUCTURE DESTRUCTION INITIATED*
+  #           *Environment:* ${{ github.event.inputs.environment }}
+  #           *Requested by:* ${{ github.actor }}
+  #           *Ticket:* ${{ github.event.inputs.ticket_id }}
+  #           *Reason:* ${{ github.event.inputs.reason }}
             
-      #       Destruction will begin in 10 minutes. React with 🔴 to abort.
-      #   env:
-      #     SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+  #           Destruction will begin in 10 minutes. React with 🔴 to abort.
+  #       env:
+  #         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
-      - name: Send Email Notification
-        uses: dawidd6/action-send-mail@v3
-        with:
-          subject: "🚨 Infrastructure Destruction Initiated - ${{ github.event.inputs.environment }}"
-          server_address: ${{ secrets.SMTP_SERVER }}
-          server_port: ${{ secrets.SMTP_PORT }}
-          username: ${{ secrets.SMTP_USERNAME }}
-          password: ${{ secrets.SMTP_PASSWORD }}
-          from: github-actions@company.com
-          to: ${{ secrets.EMAIL_NOTIFICATIONS }}
-          convert_markdown: true
-          body: |
-            Infrastructure destruction has been initiated.
+  #     - name: Send Email Notification
+  #       uses: dawidd6/action-send-mail@v3
+  #       with:
+  #         subject: "🚨 Infrastructure Destruction Initiated - ${{ github.event.inputs.environment }}"
+  #         server_address: ${{ secrets.SMTP_SERVER }}
+  #         server_port: ${{ secrets.SMTP_PORT }}
+  #         username: ${{ secrets.SMTP_USERNAME }}
+  #         password: ${{ secrets.SMTP_PASSWORD }}
+  #         from: github-actions@company.com
+  #         to: ${{ secrets.EMAIL_NOTIFICATIONS }}
+  #         convert_markdown: true
+  #         body: |
+  #           Infrastructure destruction has been initiated.
             
-            Environment: ${{ github.event.inputs.environment }}
-            Requested by: ${{ github.actor }}
-            Ticket: ${{ github.event.inputs.ticket_id }}
-            Reason: ${{ github.event.inputs.reason }}
+  #           Environment: ${{ github.event.inputs.environment }}
+  #           Requested by: ${{ github.actor }}
+  #           Ticket: ${{ github.event.inputs.ticket_id }}
+  #           Reason: ${{ github.event.inputs.reason }}
             
-            This action will begin in 10 minutes.
+  #           This action will begin in 10 minutes.
 
-      - name: Mandatory Wait Period
-        run: |
-          echo "Waiting 10 minutes before proceeding with destruction..."
-          sleep 600
+  #     - name: Mandatory Wait Period
+  #       run: |
+  #         echo "Waiting 10 minutes before proceeding with destruction..."
+  #         sleep 600
 
   destroy-terraform:
     name: 💥 Execute Infrastructure Destruction
-    needs: [pre-destroy-checks, notify-stakeholders]
+    needs: [pre-destroy-checks]  # , notify-stakeholders]
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.event.inputs.environment }}
@@ -231,41 +231,41 @@ jobs:
           path: audit-logs/
           retention-days: 90
 
-  post-destroy-notifications:
-    name: 📝 Post-Destruction Tasks
-    needs: [destroy-terraform, pre-destroy-checks]
-    runs-on: ubuntu-latest
-    environment:
-      name: ${{ github.event.inputs.environment }}
-      url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-    if: always()
+  # post-destroy-notifications:
+  #   name: 📝 Post-Destruction Tasks
+  #   needs: [destroy-terraform, pre-destroy-checks]
+  #   runs-on: ubuntu-latest
+  #   environment:
+  #     name: ${{ github.event.inputs.environment }}
+  #     url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+  #   if: always()
     
-    steps:
-      # - name: Notify Slack of Completion
-      #   uses: slackapi/slack-github-action@v1.24.0
-      #   with:
-      #     channel-id: 'infrastructure-alerts'
-      #     slack-message: |
-      #       Infrastructure Destruction Status: ${{ needs.destroy-terraform.result == 'success' && '✅ Completed' || '❌ Failed' }}
-      #       Environment: ${{ github.event.inputs.environment }}
-      #       Executed by: ${{ github.actor }}
-      #       Workflow Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-      #   env:
-      #     SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+  #   steps:
+  #     - name: Notify Slack of Completion
+  #       uses: slackapi/slack-github-action@v1.24.0
+  #       with:
+  #         channel-id: 'infrastructure-alerts'
+  #         slack-message: |
+  #           Infrastructure Destruction Status: ${{ needs.destroy-terraform.result == 'success' && '✅ Completed' || '❌ Failed' }}
+  #           Environment: ${{ github.event.inputs.environment }}
+  #           Executed by: ${{ github.actor }}
+  #           Workflow Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+  #       env:
+  #         SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       
-      - name: Send Email Notification
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: ${{ secrets.SMTP_SERVER }}
-          server_port: ${{ secrets.SMTP_PORT }}
-          username: ${{ secrets.SMTP_USERNAME }}
-          password: ${{ secrets.SMTP_PASSWORD }}
-          subject: "🚨 Infrastructure Destruction Completed"
-          from: github-actions@company.com
-          to: ${{ secrets.EMAIL_NOTIFICATIONS }}
-          body: |
-            Infrastructure destruction has been completed successfully.
+  #     - name: Send Email Notification
+  #       uses: dawidd6/action-send-mail@v3
+  #       with:
+  #         server_address: ${{ secrets.SMTP_SERVER }}
+  #         server_port: ${{ secrets.SMTP_PORT }}
+  #         username: ${{ secrets.SMTP_USERNAME }}
+  #         password: ${{ secrets.SMTP_PASSWORD }}
+  #         subject: "🚨 Infrastructure Destruction Completed"
+  #         from: github-actions@company.com
+  #         to: ${{ secrets.EMAIL_NOTIFICATIONS }}
+  #         body: |
+  #           Infrastructure destruction has been completed successfully.
             
-            Environment: ${{ github.event.inputs.environment }}
-            Executed by: ${{ github.actor }}
-            Workflow Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+  #           Environment: ${{ github.event.inputs.environment }}
+  #           Executed by: ${{ github.actor }}
+  #           Workflow Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
