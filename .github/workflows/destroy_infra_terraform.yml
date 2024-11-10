@@ -124,11 +124,11 @@ jobs:
       - name: Send Email Notification
         uses: dawidd6/action-send-mail@v3
         with:
+          subject: "🚨 Infrastructure Destruction Initiated - ${{ github.event.inputs.environment }}"
           server_address: ${{ secrets.SMTP_SERVER }}
           server_port: ${{ secrets.SMTP_PORT }}
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
-          subject: "🚨 Infrastructure Destruction Initiated - ${{ github.event.inputs.environment }}"
           from: github-actions@company.com
           to: infrastructure-team@company.com  # Default recipient
           convert_markdown: true
