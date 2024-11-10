@@ -122,6 +122,7 @@ jobs:
       #     SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
       - name: Send Email Notification
+        if: ${{ secrets.EMAIL_NOTIFICATIONS }} != ''  # Only run if email notifications are configured
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: ${{ secrets.SMTP_SERVER }}
@@ -129,6 +130,9 @@ jobs:
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
           subject: "🚨 Infrastructure Destruction Initiated - ${{ github.event.inputs.environment }}"
+          from: github-actions@company.com
+          to: infrastructure-team@company.com  # Default recipient
+          convert_markdown: true
           body: |
             Infrastructure destruction has been initiated.
             
@@ -138,8 +142,6 @@ jobs:
             Reason: ${{ github.event.inputs.reason }}
             
             This action will begin in 10 minutes.
-          from: github-actions@company.com
-          to: ${{ secrets.EMAIL_NOTIFICATIONS }}
 
       - name: Mandatory Wait Period
         run: |
@@ -254,11 +256,11 @@ jobs:
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
           subject: "🚨 Infrastructure Destruction Completed"
+          from: github-actions@company.com
+          to: ${{ secrets.EMAIL_NOTIFICATIONS }}
           body: |
             Infrastructure destruction has been completed successfully.
             
             Environment: ${{ github.event.inputs.environment }}
             Executed by: ${{ github.actor }}
             Workflow Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          from: github-actions@company.com
-          to: ${{ secrets.EMAIL_NOTIFICATIONS }}
