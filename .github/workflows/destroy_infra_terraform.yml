@@ -122,7 +122,6 @@ jobs:
       #     SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
       - name: Send Email Notification
-        if: ${{ secrets.EMAIL_NOTIFICATIONS }} != ''  # Only run if email notifications are configured
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: ${{ secrets.SMTP_SERVER }}

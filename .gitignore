@@ -30,6 +30,7 @@ dist/
 .idea/
 
 # Cursor IDE
+.vscode/
 .cursorrules
 
 # Dev
