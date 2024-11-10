@@ -105,6 +105,9 @@ jobs:
     name: 📢 Notify Stakeholders
     needs: pre-destroy-checks
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.environment }}
+      url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
     steps:
       # - name: Send Slack Notification
       #   uses: slackapi/slack-github-action@v1.24.0
@@ -130,7 +133,7 @@ jobs:
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
           from: github-actions@company.com
-          to: infrastructure-team@company.com  # Default recipient
+          to: ${{ secrets.EMAIL_NOTIFICATIONS }}
           convert_markdown: true
           body: |
             Infrastructure destruction has been initiated.
@@ -151,7 +154,7 @@ jobs:
     name: 💥 Execute Infrastructure Destruction
     needs: [pre-destroy-checks, notify-stakeholders]
     runs-on: ubuntu-latest
-    environment: 
+    environment:
       name: ${{ github.event.inputs.environment }}
       url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
@@ -232,6 +235,9 @@ jobs:
     name: 📝 Post-Destruction Tasks
     needs: [destroy-terraform, pre-destroy-checks]
     runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event.inputs.environment }}
+      url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
     if: always()
     
     steps:
