@@ -40,7 +40,9 @@
 [//]: # ([![GitHub]&#40;https://img.shields.io/github/contributors/ezazml/ezazml&#41;]&#40;https://github.com/basileazh/ezazml/graphs/contributors&#41;)
 
 
-EZAZ ML is an end-to-end solution that dramatically simplifies the deployment and management of Machine Learning operations on Azure. By combining Infrastructure as Code (Terraform), a powerful CLI, and environment-based configuration, it eliminates the complexity typically associated with Azure ML implementations.
+EZAZ ML is an end-to-end solution that dramatically simplifies the deployment and management of Machine Learning Operations on Azure. By combining Infrastructure as Code (Terraform), a powerful CLI, and environment-based configuration, it eliminates the complexity typically associated with Azure ML implementations.
+
+All you need is a GitHub repository and an Azure Subscription, and you can have a fully functional MLOps environment in minutes. You can then customize it to your needs by setting the environment variables and updating the train.py and inference.py files.
 
 ## Agenda
 1. [Why EZAZ ML?](#why-ezaz-ml)

@@ -10,8 +10,8 @@ login:
 	az login
 
 login-spn:
-	az account set -s $(ARM_SUBSCRIPTION_ID)
 	az login --service-principal --tenant $(ARM_TENANT_ID) -u $(ARM_CLIENT_ID) -p $(ARM_CLIENT_SECRET)
+	az account set -s $(ARM_SUBSCRIPTION_ID)
 
 # Infrastructure as Code with Terraform
 
