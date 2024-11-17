@@ -157,6 +157,38 @@ jobs:
     environment:
       name: ${{ github.event.inputs.environment }}
       url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    env:
+      # # Infrastructure settings
+      # ## Terraform
+      # TF_OUTPUT_NAME: "tf.tfplan"
+      # TF_WORKSPACE: "dev"
+      # ## Resource group
+      # TF_VAR_tenant_id: ${{ secrets.ARM_TENANT_ID }}
+      # TF_VAR_location: "westeurope"
+      # TF_VAR_resource_name_prefix: "ezazml7"
+      # ## Authentication, users and spn
+      # TF_VAR_devops_spn_object_id: ${{ secrets.TF_VAR_DEVOPS_SPN_OBJECT_ID }}
+      # TF_VAR_tf_backend_storage_account_id: ${{ secrets.TF_VAR_TF_BACKEND_STORAGE_ACCOUNT_ID }}
+      # TF_VAR_auth_application_name_prefix: "ezazml7-app"
+      # TF_VAR_user_principal_name_prefix: "user1"
+      # TF_VAR_user_display_name: "User 1"
+      # TF_VAR_user_password: ${{ secrets.TF_VAR_USER_PASSWORD }}
+      # ## Storage
+      # TF_VAR_adls_container_name: "ezazml"
+      # ## Compute
+      # TF_VAR_compute_instance_size_dev: "Standard_A1_v2"
+      # TF_VAR_compute_cluster_size_dev: "STANDARD_DS2_V2"
+      # TF_VAR_compute_cluster_size_prd: "Standard_A1_v2"
+      # TF_VAR_compute_instance_count_dev: "0"
+      # TF_VAR_compute_instance_count_prd: "0"
+      # TF_VAR_compute_cluster_count_dev: "1"
+      # TF_VAR_compute_cluster_count_prd: "1"
+      # TF_VAR_compute_cluster_priority_dev: "Dedicated"
+      # TF_VAR_compute_cluster_priority_prd: "LowPriority"
+      # TF_VAR_compute_cluster_scale_min_node_dev: "0"
+      # TF_VAR_compute_cluster_scale_min_node_prd: "0"
+      # TF_VAR_compute_cluster_scale_max_node_dev: "3"
+      # TF_VAR_compute_cluster_scale_max_node_prd: "3"
 
     steps:
       - name: Checkout Repository
@@ -175,9 +207,9 @@ jobs:
       - name: Azure Login
         uses: azure/login@v1
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-id: ${{ secrets.ARM_CLIENT_ID }}
+          tenant-id: ${{ secrets.ARM_TENANT_ID }}
+          subscription-id: ${{ secrets.ARM_SUBSCRIPTION_ID }}
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -190,9 +222,9 @@ jobs:
           make tf-init-ws
         env:
           TF_WORKSPACE: ${{ github.event.inputs.environment }}
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
           ARM_USE_OIDC: true
 
       - name: Terraform Plan Destroy
@@ -203,9 +235,9 @@ jobs:
           terraform show -json destroy.tfplan > ../audit-logs/destroy-plan.json
         env:
           TF_WORKSPACE: ${{ github.event.inputs.environment }}
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
           ARM_USE_OIDC: true
 
       - name: Execute Terraform Destroy
@@ -214,9 +246,9 @@ jobs:
           make tf-destroy-aa
         env:
           TF_WORKSPACE: ${{ github.event.inputs.environment }}
-          ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
           ARM_USE_OIDC: true
 
       - name: Record Post-Destruction State

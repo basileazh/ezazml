@@ -60,7 +60,7 @@ permissions:
   contents: read
 
 jobs:
-  terraform:
+  deploy_infra:
     name: 'Terraform'
     runs-on: ubuntu-latest
     environment: dev
