@@ -157,7 +157,7 @@ jobs:
     environment:
       name: ${{ github.event.inputs.environment }}
       url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-    env:
+    # env:
       # # Infrastructure settings
       # ## Terraform
       # TF_OUTPUT_NAME: "tf.tfplan"
