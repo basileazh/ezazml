@@ -205,12 +205,13 @@ jobs:
           echo "Workflow Run ID: ${{ github.run_id }}" >> audit-logs/pre-destruction-state.txt
 
       - name: Azure Login
-        working-directory: .
+        working-directory: ./env/${{ github.event.inputs.environment }}
         run: |
           make login-spn
         env:
           TF_WORKSPACE: ${{ github.event.inputs.environment }}
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
           ARM_USE_OIDC: true
@@ -227,6 +228,7 @@ jobs:
         env:
           TF_WORKSPACE: ${{ github.event.inputs.environment }}
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
           ARM_USE_OIDC: true
@@ -240,6 +242,7 @@ jobs:
         env:
           TF_WORKSPACE: ${{ github.event.inputs.environment }}
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
           ARM_USE_OIDC: true
@@ -251,6 +254,7 @@ jobs:
         env:
           TF_WORKSPACE: ${{ github.event.inputs.environment }}
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
           ARM_USE_OIDC: true
