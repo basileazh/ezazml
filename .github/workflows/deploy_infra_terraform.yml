@@ -184,6 +184,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Create Audit Log Directory
+        run: mkdir -p audit-logs
+
       - name: Azure Login
         working-directory: ./env/${{ github.event.inputs.environment || 'dev' }}
         run: make login-spn

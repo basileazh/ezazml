@@ -22,7 +22,6 @@ tf-fmt-check:
 	terraform fmt -check
 
 tf-plan:
-	terraform fmt
 	terraform plan -input=false -out "../env/${TF_WORKSPACE}/${TF_OUTPUT_NAME}"
 
 tf-plan-no-output:
