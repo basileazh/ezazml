@@ -6,13 +6,6 @@ TF_OUTPUT_NAME ?= tfplan
 tf-init:
 	terraform init
 
-tf-init-ws:
-	terraform init
-	terraform workspace select $(TF_WORKSPACE) || terraform workspace new $(TF_WORKSPACE)
-
-tf-select-ws:
-	terraform workspace select $(TF_WORKSPACE)
-
 tf-upgrade:
 	terraform init -upgrade
 

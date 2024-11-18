@@ -444,7 +444,9 @@ make login
 ##### CLI Step 4: Initialize Terraform
 
 Run the following command to initialize Terraform. This will set up the backend and configure the state according 
-to the settings in the `providers.tf` file. Additionally, the `dev` workspace will be created if it does not already exist.
+to the settings in the `providers.tf` file. Additionally, the `$TF_WORKSPACE` workspace will be created if it does not already exist, by default `dev`. 
+
+The folder `env/<env_name>/` should have `<env_name> = $TF_WORKSPACE`. If the folder does not exist, you can create it by duplicating the structure of the `env/dev/` folder.
 
 ```bash
 make tf-init

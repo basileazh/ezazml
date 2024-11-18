@@ -18,9 +18,6 @@ login-spn:
 tf-init:
 	${MAKE} -C ../../iac/ tf-init
 
-tf-init-ws:
-	${MAKE} -C ../../iac/ tf-init-ws
-
 tf-upgrade:
 	${MAKE} -C ../../iac/ tf-upgrade
 
