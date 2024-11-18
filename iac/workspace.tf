@@ -25,7 +25,7 @@ resource "azurerm_container_registry" "default" {
   name                = "${var.resource_name_prefix}${terraform.workspace}acr01"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  sku                 = "Premium"
+  sku                 = "Basic"
   admin_enabled       = true
 }
 
