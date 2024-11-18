@@ -163,7 +163,6 @@ jobs:
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
       ARM_USE_OIDC: true
-
       # Infrastructure settings
       ## Terraform
       TF_OUTPUT_NAME: "tf.tfplan"
