@@ -170,16 +170,16 @@ jobs:
       ## Resource group
       TF_VAR_tenant_id: ${{ secrets.ARM_TENANT_ID }}
       TF_VAR_location: "westeurope"
-      TF_VAR_resource_name_prefix: "ezazml7"
+      TF_VAR_resource_name_prefix: "ezazml8"
       ## Authentication, users and spn
       TF_VAR_devops_spn_object_id: ${{ secrets.TF_VAR_DEVOPS_SPN_OBJECT_ID }}
       TF_VAR_tf_backend_storage_account_id: ${{ secrets.TF_VAR_TF_BACKEND_STORAGE_ACCOUNT_ID }}
-      TF_VAR_auth_application_name_prefix: "ezazml7-app"
+      TF_VAR_auth_application_name_prefix: "ezazml8-app"
       TF_VAR_user_principal_name_prefix: "user1"
       TF_VAR_user_display_name: "User 1"
       TF_VAR_user_password: ${{ secrets.TF_VAR_USER_PASSWORD }}
       ## Storage
-      TF_VAR_adls_container_name: "ezazml"
+      TF_VAR_adls_container_name: "ezazml8"
       ## Compute
       TF_VAR_compute_instance_size_dev: "Standard_A1_v2"
       TF_VAR_compute_cluster_size_dev: "STANDARD_DS2_V2"
@@ -203,11 +203,13 @@ jobs:
 
       - name: Record Pre-Destruction State
         run: |
-          CURRENT_TIME=$(date '+%Y-%m-%d %H:%M:%S %Z')
+          CURRENT_TIME=$(date '+%Y-%m-%d-%H-%M-%S')
           echo "Recording pre-destruction state at ${CURRENT_TIME}" > audit-logs/pre-destruction-state.txt
           echo "Actor: ${{ github.actor }}" >> audit-logs/pre-destruction-state.txt
           echo "Environment: ${{ github.event.inputs.environment }}" >> audit-logs/pre-destruction-state.txt
           echo "Workflow Run ID: ${{ github.run_id }}" >> audit-logs/pre-destruction-state.txt
+          echo "Ticket ID: ${{ github.event.inputs.ticket_id }}" >> audit-logs/pre-destruction-state.txt
+          echo "Reason: ${{ github.event.inputs.reason }}" >> audit-logs/pre-destruction-state.txt
 
       - name: Azure Login
         working-directory: ./env/${{ github.event.inputs.environment }}
@@ -238,14 +240,14 @@ jobs:
 
       - name: Record Post-Destruction State
         run: |
-          CURRENT_TIME=$(date '+%Y-%m-%d %H:%M:%S %Z')
+          CURRENT_TIME=$(date '+%Y-%m-%d-%H-%M-%S')
           echo "Recording post-destruction state at ${CURRENT_TIME}" > audit-logs/post-destruction-state.txt
           echo "Destruction completed successfully at ${CURRENT_TIME}" >> audit-logs/post-destruction-state.txt
 
       - name: Upload Audit Logs
         uses: actions/upload-artifact@v4
         with:
-          name: destruction-audit-logs-${{ github.event.inputs.environment }}-$(date '+%Y-%m-%d %H:%M:%S %Z')
+          name: destruction-audit-logs-${{ github.event.inputs.environment }}-$(date '+%Y-%m-%d-%H-%M-%S')
           path: audit-logs/
           compression-level: 9
           retention-days: 90

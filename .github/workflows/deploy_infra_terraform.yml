@@ -106,7 +106,7 @@ jobs:
 
       - name: Record Deployment Initiation
         run: |
-          CURRENT_TIME=$(date '+%Y-%m-%d %H:%M:%S %Z')
+          CURRENT_TIME=$(date '+%Y-%m-%d-%H-%M-%S')
           {
             echo "Deployment initiated at ${CURRENT_TIME}"
             echo "Actor: ${{ github.actor }}"
@@ -187,6 +187,18 @@ jobs:
       - name: Create Audit Log Directory
         run: mkdir -p audit-logs
 
+      - name: Record Pre-Deployment State
+        run: |
+          CURRENT_TIME=$(date '+%Y-%m-%d-%H-%M-%S')
+          echo "Recording pre-deployment state at ${CURRENT_TIME}" > audit-logs/pre-deployment-state.txt
+          echo "Actor: ${{ github.actor }}" >> audit-logs/pre-deployment-state.txt
+          echo "Environment: ${{ github.event.inputs.environment || 'dev' }}" >> audit-logs/pre-deployment-state.txt
+          echo "Workflow Run ID: ${{ github.run_id }}" >> audit-logs/pre-deployment-state.txt
+          echo "Trigger: ${{ github.event_name }}" >> audit-logs/pre-deployment-state.txt
+          echo "Ticket ID: ${{ github.event.inputs.ticket_id || 'N/A' }}" >> audit-logs/pre-deployment-state.txt
+          echo "Reason: ${{ github.event.inputs.reason || 'Automated deployment from main branch' }}" >> audit-logs/pre-deployment-state.txt
+
+
       - name: Azure Login
         working-directory: ./env/${{ github.event.inputs.environment || 'dev' }}
         run: make login-spn
@@ -218,17 +230,20 @@ jobs:
 
       - name: Record Post-Deployment State
         run: |
-          CURRENT_TIME=$(date '+%Y-%m-%d %H:%M:%S %Z')
+          CURRENT_TIME=$(date '+%Y-%m-%d-%H-%M-%S')
           {
             echo "Deployment completed at ${CURRENT_TIME}"
             echo "Status: Success"
             echo "Environment: ${{ github.event.inputs.environment || 'dev' }}"
+            echo "Workflow Run ID: ${{ github.run_id }}"
+            echo "Ticket ID: ${{ github.event.inputs.ticket_id || 'N/A' }}"
+            echo "Reason: ${{ github.event.inputs.reason || 'Automated deployment from main branch' }}"
           } > audit-logs/post-deployment-state.txt
 
       - name: Upload Audit Logs
         uses: actions/upload-artifact@v4
         with:
-          name: deployment-audit-logs-${{ github.event.inputs.environment || 'dev' }}-$(date '+%Y-%m-%d %H:%M:%S %Z')
+          name: deployment-audit-logs-${{ github.event.inputs.environment || 'dev' }}-$(date '+%Y-%m-%d-%H-%M-%S')
           path: audit-logs/
           compression-level: 9
           retention-days: 90
