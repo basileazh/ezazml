@@ -205,8 +205,8 @@ jobs:
         id: plan
         working-directory: ./iac
         run: |
-          make tf-plan
-          terraform show -json $TF_OUTPUT_NAME > ../audit-logs/$TF_OUTPUT_NAME.json
+          make tf-plan-destroy
+          terraform show -json ../env/$(TF_WORKSPACE)/$(TF_OUTPUT_NAME) > ../audit-logs/$TF_OUTPUT_NAME.json
         env:
           TF_WORKSPACE: ${{ github.event.inputs.environment }}
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}

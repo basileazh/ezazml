@@ -18,15 +18,21 @@ tf-import-aml:
 tf-import-adls:
 	terraform import -var-file="${TF_VAR_FILE_PATH}" azurerm_storage_account.default /subscriptions/$(ARM_SUBSCRIPTION_ID)/resourceGroups/$(AML_RESOURCE_GROUP)/providers/Microsoft.Storage/storageAccounts/$(ADLS_ACCOUNT_NAME)
 
-tf-plan-no-output-aa:
-	terraform plan -input=false
-
 tf-fmt-check:
 	terraform fmt -check
 
 tf-plan:
 	terraform fmt
-	terraform plan -out "../env/$(TF_WORKSPACE)/$(TF_OUTPUT_NAME)"
+	terraform plan -input=false -out "../env/$(TF_WORKSPACE)/$(TF_OUTPUT_NAME)"
+
+tf-plan-no-output:
+	terraform plan -input=false
+
+tf-plan-destroy:
+	terraform plan -destroy -input=false -out="../env/$(TF_WORKSPACE)/$(TF_OUTPUT_NAME)"
+
+tf-plan-destroy-no-output:
+	terraform plan -destroy -input=false
 
 tf-apply:
 	terraform apply "../env/$(TF_WORKSPACE)/$(TF_OUTPUT_NAME)"

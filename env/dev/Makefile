@@ -27,14 +27,20 @@ tf-import-rg:
 tf-import-adls:
 	${MAKE} -C ../../iac/ tf-import-adls
 
-tf-plan-no-output-aa:
-	${MAKE} -C ../../iac/ tf-plan-no-output-aa
-
 tf-fmt-check:
 	${MAKE} -C ../../iac/ tf-fmt-check
 
+tf-plan-no-output:
+	${MAKE} -C ../../iac/ tf-plan-no-output
+
 tf-plan:
 	${MAKE} -C ../../iac/ tf-plan
+
+tf-plan-destroy:
+	${MAKE} -C ../../iac/ tf-plan-destroy
+
+tf-plan-destroy-no-output:
+	${MAKE} -C ../../iac/ tf-plan-destroy-no-output
 
 tf-apply:
 	${MAKE} -C ../../iac/ tf-apply
