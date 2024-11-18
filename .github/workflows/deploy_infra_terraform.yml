@@ -141,16 +141,14 @@ jobs:
     environment:
       name: ${{ github.event.inputs.environment || 'dev' }}
       url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
-
     env:
       # Auth settings
-      TF_WORKSPACE: ${{ github.event.inputs.environment }}
+      TF_WORKSPACE: ${{ github.event.inputs.environment || 'dev' }} # Default to dev if not specified
       ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
       ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
       ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
       ARM_USE_OIDC: true
-
       # Infrastructure settings
       ## Terraform
       TF_OUTPUT_NAME: "tf.tfplan"
