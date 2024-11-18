@@ -136,7 +136,7 @@ jobs:
     # Generates an execution plan for Terraform
     - name: Terraform Plan
       run:
-        make tf-plan-no-output-aa
+        make tf-plan-no-output
       working-directory: env/dev
 
     # On push to "main", build or change infrastructure according to Terraform configuration files
