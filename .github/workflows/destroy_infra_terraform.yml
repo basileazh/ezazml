@@ -156,7 +156,44 @@ jobs:
     environment:
       name: ${{ github.event.inputs.environment }}
       url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+    env:
+      TF_WORKSPACE: ${{ github.event.inputs.environment }}
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      ARM_USE_OIDC: true
 
+      # Infrastructure settings
+      ## Terraform
+      TF_OUTPUT_NAME: "tf.tfplan"
+      ## Resource group
+      TF_VAR_tenant_id: ${{ secrets.ARM_TENANT_ID }}
+      TF_VAR_location: "westeurope"
+      TF_VAR_resource_name_prefix: "ezazml7"
+      ## Authentication, users and spn
+      TF_VAR_devops_spn_object_id: ${{ secrets.TF_VAR_DEVOPS_SPN_OBJECT_ID }}
+      TF_VAR_tf_backend_storage_account_id: ${{ secrets.TF_VAR_TF_BACKEND_STORAGE_ACCOUNT_ID }}
+      TF_VAR_auth_application_name_prefix: "ezazml7-app"
+      TF_VAR_user_principal_name_prefix: "user1"
+      TF_VAR_user_display_name: "User 1"
+      TF_VAR_user_password: ${{ secrets.TF_VAR_USER_PASSWORD }}
+      ## Storage
+      TF_VAR_adls_container_name: "ezazml"
+      ## Compute
+      TF_VAR_compute_instance_size_dev: "Standard_A1_v2"
+      TF_VAR_compute_cluster_size_dev: "STANDARD_DS2_V2"
+      TF_VAR_compute_cluster_size_prd: "Standard_A1_v2"
+      TF_VAR_compute_instance_count_dev: "0"
+      TF_VAR_compute_instance_count_prd: "0"
+      TF_VAR_compute_cluster_count_dev: "1"
+      TF_VAR_compute_cluster_count_prd: "1"
+      TF_VAR_compute_cluster_priority_dev: "Dedicated"
+      TF_VAR_compute_cluster_priority_prd: "LowPriority"
+      TF_VAR_compute_cluster_scale_min_node_dev: "0"
+      TF_VAR_compute_cluster_scale_min_node_prd: "0"
+      TF_VAR_compute_cluster_scale_max_node_dev: "3"
+      TF_VAR_compute_cluster_scale_max_node_prd: "3"
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -166,7 +203,8 @@ jobs:
 
       - name: Record Pre-Destruction State
         run: |
-          echo "Recording pre-destruction state at $(date)" > audit-logs/pre-destruction-state.txt
+          CURRENT_TIME=$(date '+%Y-%m-%d %H:%M:%S %Z')
+          echo "Recording pre-destruction state at ${CURRENT_TIME}" > audit-logs/pre-destruction-state.txt
           echo "Actor: ${{ github.actor }}" >> audit-logs/pre-destruction-state.txt
           echo "Environment: ${{ github.event.inputs.environment }}" >> audit-logs/pre-destruction-state.txt
           echo "Workflow Run ID: ${{ github.run_id }}" >> audit-logs/pre-destruction-state.txt
@@ -175,14 +213,6 @@ jobs:
         working-directory: ./env/${{ github.event.inputs.environment }}
         run: |
           make login-spn
-        env:
-          TF_WORKSPACE: ${{ github.event.inputs.environment }}
-          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-          ARM_USE_OIDC: true
-
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -193,13 +223,6 @@ jobs:
         working-directory: ./iac
         run: |
           make tf-init
-        env:
-          TF_WORKSPACE: ${{ github.event.inputs.environment }}
-          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-          ARM_USE_OIDC: true
 
       - name: Terraform Plan Destroy
         id: plan
@@ -207,97 +230,24 @@ jobs:
         run: |
           make tf-plan-destroy
           terraform show -json ../env/$TF_WORKSPACE/$TF_OUTPUT_NAME > ../audit-logs/$TF_OUTPUT_NAME.json
-        env:
-          TF_WORKSPACE: ${{ github.event.inputs.environment }}
-          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-          ARM_USE_OIDC: true
-          # Infrastructure settings
-          ## Terraform
-          TF_OUTPUT_NAME: "tf.tfplan"
-          ## Resource group
-          TF_VAR_tenant_id: ${{ secrets.ARM_TENANT_ID }}
-          TF_VAR_location: "westeurope"
-          TF_VAR_resource_name_prefix: "ezazml7"
-          ## Authentication, users and spn
-          TF_VAR_devops_spn_object_id: ${{ secrets.TF_VAR_DEVOPS_SPN_OBJECT_ID }}
-          TF_VAR_tf_backend_storage_account_id: ${{ secrets.TF_VAR_TF_BACKEND_STORAGE_ACCOUNT_ID }}
-          TF_VAR_auth_application_name_prefix: "ezazml7-app"
-          TF_VAR_user_principal_name_prefix: "user1"
-          TF_VAR_user_display_name: "User 1"
-          TF_VAR_user_password: ${{ secrets.TF_VAR_USER_PASSWORD }}
-          ## Storage
-          TF_VAR_adls_container_name: "ezazml"
-          ## Compute
-          TF_VAR_compute_instance_size_dev: "Standard_A1_v2"
-          TF_VAR_compute_cluster_size_dev: "STANDARD_DS2_V2"
-          TF_VAR_compute_cluster_size_prd: "Standard_A1_v2"
-          TF_VAR_compute_instance_count_dev: "0"
-          TF_VAR_compute_instance_count_prd: "0"
-          TF_VAR_compute_cluster_count_dev: "1"
-          TF_VAR_compute_cluster_count_prd: "1"
-          TF_VAR_compute_cluster_priority_dev: "Dedicated"
-          TF_VAR_compute_cluster_priority_prd: "LowPriority"
-          TF_VAR_compute_cluster_scale_min_node_dev: "0"
-          TF_VAR_compute_cluster_scale_min_node_prd: "0"
-          TF_VAR_compute_cluster_scale_max_node_dev: "3"
-          TF_VAR_compute_cluster_scale_max_node_prd: "3"
 
       - name: Execute Terraform Destroy
         working-directory: ./iac
         run: |
           make tf-destroy-aa
-        env:
-          TF_WORKSPACE: ${{ github.event.inputs.environment }}
-          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
-          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-          ARM_USE_OIDC: true
-
-          # Infrastructure settings
-          ## Terraform
-          TF_OUTPUT_NAME: "tf.tfplan"
-          ## Resource group
-          TF_VAR_tenant_id: ${{ secrets.ARM_TENANT_ID }}
-          TF_VAR_location: "westeurope"
-          TF_VAR_resource_name_prefix: "ezazml7"
-          ## Authentication, users and spn
-          TF_VAR_devops_spn_object_id: ${{ secrets.TF_VAR_DEVOPS_SPN_OBJECT_ID }}
-          TF_VAR_tf_backend_storage_account_id: ${{ secrets.TF_VAR_TF_BACKEND_STORAGE_ACCOUNT_ID }}
-          TF_VAR_auth_application_name_prefix: "ezazml7-app"
-          TF_VAR_user_principal_name_prefix: "user1"
-          TF_VAR_user_display_name: "User 1"
-          TF_VAR_user_password: ${{ secrets.TF_VAR_USER_PASSWORD }}
-          ## Storage
-          TF_VAR_adls_container_name: "ezazml"
-          ## Compute
-          TF_VAR_compute_instance_size_dev: "Standard_A1_v2"
-          TF_VAR_compute_cluster_size_dev: "STANDARD_DS2_V2"
-          TF_VAR_compute_cluster_size_prd: "Standard_A1_v2"
-          TF_VAR_compute_instance_count_dev: "0"
-          TF_VAR_compute_instance_count_prd: "0"
-          TF_VAR_compute_cluster_count_dev: "1"
-          TF_VAR_compute_cluster_count_prd: "1"
-          TF_VAR_compute_cluster_priority_dev: "Dedicated"
-          TF_VAR_compute_cluster_priority_prd: "LowPriority"
-          TF_VAR_compute_cluster_scale_min_node_dev: "0"
-          TF_VAR_compute_cluster_scale_min_node_prd: "0"
-          TF_VAR_compute_cluster_scale_max_node_dev: "3"
-          TF_VAR_compute_cluster_scale_max_node_prd: "3"
 
       - name: Record Post-Destruction State
         run: |
-          echo "Recording post-destruction state at $(date)" > audit-logs/post-destruction-state.txt
-          echo "Destruction completed successfully" >> audit-logs/post-destruction-state.txt
+          CURRENT_TIME=$(date '+%Y-%m-%d %H:%M:%S %Z')
+          echo "Recording post-destruction state at ${CURRENT_TIME}" > audit-logs/post-destruction-state.txt
+          echo "Destruction completed successfully at ${CURRENT_TIME}" >> audit-logs/post-destruction-state.txt
 
       - name: Upload Audit Logs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: destruction-audit-logs
+          name: destruction-audit-logs-${{ github.event.inputs.environment }}-$(date '+%Y-%m-%d %H:%M:%S %Z')
           path: audit-logs/
+          compression-level: 9
           retention-days: 90
 
   # post-destroy-notifications:

@@ -353,11 +353,18 @@ The recommended way to deploy the infrastructure is to use GitHub Actions.
      3. Select branch
      4. Click "Run workflow"
 
+###### Safety Checks
+   The workflow will automatically:
+   - (Optional) Check business hours (Mon-Fri, 9 AM - 5 PM)
+   - (Optional) Send notification to stakeholders
+
+You can modify the workflow to add or remove safety checks as needed in the `.github/workflows/deploy_infra_terraform.yml` file. the business hours check and the notification to stakeholders are commented out by default.
+
 ##### GHA Step 4: Monitor Deployment
    - View progress in GitHub Actions tab
    - Check job outputs for each step
    - Review Terraform plans in job artifacts
-
+   - Await completion email notification
 
 #### CLI Deployment
 
@@ -503,24 +510,29 @@ Azure portal: https://portal.azure.com/
       - Environment (dev/staging/prod)
       - Confirmation string (format: `DESTROY-INFRASTRUCTURE-[ENV]-[DATE]`)
       - Reason for destruction
-      - Related ticket ID
+      - (Optional) Related ticket ID
    4. Click "Run workflow"
 
 ##### Secrets
 
 To ensure the proper functioning of the destruction workflow, you need to set the following secrets in your GitHub repository:
  ```text
-   # Azure Authentication
+   # Mandatory
+
+   ## Azure Authentication
    AZURE_CLIENT_ID          # DevOps SPN Client ID
    AZURE_SUBSCRIPTION_ID    # Azure Subscription ID
    AZURE_TENANT_ID         # Azure Tenant ID
    ARM_SUBSCRIPTION_ID     # Azure Subscription ID
    
-   # Terraform Variables
+   ## Terraform Variables
    TF_VAR_DEVOPS_SPN_OBJECT_ID           # Object ID of the DevOps SPN
    TF_VAR_TF_BACKEND_STORAGE_ACCOUNT_ID   # Storage Account ID for Terraform backend
    TF_VAR_USER_PASSWORD                   # Password for the Azure AD user
-
+  
+   # Optional
+   
+   ## SMTP Settings
    SMTP_SERVER           # SMTP server address
    SMTP_PORT           # SMTP server port
    SMTP_USERNAME           # SMTP server username
@@ -535,6 +547,8 @@ To ensure the proper functioning of the destruction workflow, you need to set th
    - Verify user authorization
    - Send notification to stakeholders
    - Wait 10 minutes before proceeding
+
+You can modify the workflow to add or remove safety checks as needed in the `.github/workflows/deploy_infra_terraform.yml` file. the business hours check, the notification to stakeholders, and the 10 minutes wait are commented out by default.
 
 ##### Monitor Destruction
    - View progress in GitHub Actions tab
