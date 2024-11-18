@@ -22,7 +22,6 @@ on:
         type: string
       ticket_id:
         description: 'Related JIRA/ticket reference'
-        required: true
         type: string
 
 # Prevent multiple destruction workflows from running simultaneously
