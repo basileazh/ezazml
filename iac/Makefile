@@ -23,19 +23,19 @@ tf-fmt-check:
 
 tf-plan:
 	terraform fmt
-	terraform plan -input=false -out "../env/$(TF_WORKSPACE)/$(TF_OUTPUT_NAME)"
+	terraform plan -input=false -out "../env/${TF_WORKSPACE}/${TF_OUTPUT_NAME}"
 
 tf-plan-no-output:
 	terraform plan -input=false
 
 tf-plan-destroy:
-	terraform plan -destroy -input=false -out="../env/$(TF_WORKSPACE)/$(TF_OUTPUT_NAME)"
+	terraform plan -destroy -input=false -out="../env/${TF_WORKSPACE}/${TF_OUTPUT_NAME}"
 
 tf-plan-destroy-no-output:
 	terraform plan -destroy -input=false
 
 tf-apply:
-	terraform apply "../env/$(TF_WORKSPACE)/$(TF_OUTPUT_NAME)"
+	terraform apply "../env/${TF_WORKSPACE}/${TF_OUTPUT_NAME}"
 
 tf-apply-aa:
 	terraform apply -auto-approve
